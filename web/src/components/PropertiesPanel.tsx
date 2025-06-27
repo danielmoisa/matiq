@@ -31,7 +31,7 @@ export default function PropertiesPanel({ node, onUpdateNode }: PropertiesPanelP
         <input
           type="text"
           placeholder="postgresql://user:password@host:port/database"
-          className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+          className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent placeholder-gray-600 text-gray-900"
         />
       </div>
       <div>
@@ -39,7 +39,7 @@ export default function PropertiesPanel({ node, onUpdateNode }: PropertiesPanelP
         <textarea
           rows={4}
           placeholder="SELECT * FROM users WHERE created_at > NOW() - INTERVAL '1 hour'"
-          className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+          className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent placeholder-gray-600 text-gray-900"
         />
       </div>
     </div>
@@ -52,12 +52,12 @@ export default function PropertiesPanel({ node, onUpdateNode }: PropertiesPanelP
         <input
           type="url"
           placeholder="https://api.example.com/endpoint"
-          className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+          className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent placeholder-gray-600 text-gray-900"
         />
       </div>
       <div>
         <label className="block text-sm font-medium text-gray-700 mb-2">Method</label>
-        <select className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+        <select className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white text-gray-900">
           <option>GET</option>
           <option>POST</option>
           <option>PUT</option>
@@ -69,7 +69,7 @@ export default function PropertiesPanel({ node, onUpdateNode }: PropertiesPanelP
         <textarea
           rows={3}
           placeholder='{"Authorization": "Bearer token", "Content-Type": "application/json"}'
-          className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+          className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent placeholder-gray-600 text-gray-900"
         />
       </div>
     </div>
@@ -79,7 +79,7 @@ export default function PropertiesPanel({ node, onUpdateNode }: PropertiesPanelP
     <div className="space-y-4">
       <div>
         <label className="block text-sm font-medium text-gray-700 mb-2">Schedule Type</label>
-        <select className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+        <select className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white text-gray-900">
           <option>Every minute</option>
           <option>Every hour</option>
           <option>Daily</option>
@@ -92,7 +92,7 @@ export default function PropertiesPanel({ node, onUpdateNode }: PropertiesPanelP
         <input
           type="text"
           placeholder="0 0 * * *"
-          className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+          className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent placeholder-gray-600 text-gray-900"
         />
       </div>
     </div>
@@ -111,7 +111,7 @@ function transform(input) {
     processedAt: new Date().toISOString()
   };
 }`}
-          className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent font-mono text-sm"
+          className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent font-mono text-sm placeholder-gray-600 text-gray-900"
         />
       </div>
     </div>
@@ -121,7 +121,7 @@ function transform(input) {
     <div className="space-y-4">
       <div>
         <label className="block text-sm font-medium text-gray-700 mb-2">Condition</label>
-        <select className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+        <select className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white text-gray-900">
           <option>Equals</option>
           <option>Not equals</option>
           <option>Greater than</option>
@@ -135,7 +135,7 @@ function transform(input) {
         <input
           type="text"
           placeholder="Enter value to compare"
-          className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+          className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent placeholder-gray-600 text-gray-900"
         />
       </div>
     </div>
