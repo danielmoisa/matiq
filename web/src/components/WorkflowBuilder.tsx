@@ -3,13 +3,14 @@
 import { useState } from 'react';
 
 import PropertiesPanel from './PropertiesPanel';
-import { WorkflowNode, TriggerType, EventType } from '@/types/workflow';
+import { WorkflowNode, Connection, TriggerType, EventType } from '@/types/workflow';
 import Header from './Header';
 import Sidebar from './Sidebar';
 import Canvas from './Canvas';
 
 export default function WorkflowBuilder() {
   const [nodes, setNodes] = useState<WorkflowNode[]>([]);
+  const [connections, setConnections] = useState<Connection[]>([]);
   const [selectedNode, setSelectedNode] = useState<WorkflowNode | null>(null);
 
   const addNode = (type: EventType, triggerType?: TriggerType) => {
@@ -17,7 +18,10 @@ export default function WorkflowBuilder() {
       id: Date.now().toString(),
       type,
       triggerType,
-      position: { x: 100, y: 100 },
+      position: { 
+        x: 100 + (nodes.length * 250), // Stagger nodes horizontally
+        y: 100 + (nodes.length % 3) * 150 // Stagger nodes vertically every 3 nodes
+      },
       data: {},
     };
     setNodes([...nodes, newNode]);
@@ -39,6 +43,8 @@ export default function WorkflowBuilder() {
         <Canvas 
           nodes={nodes} 
           setNodes={setNodes}
+          connections={connections}
+          setConnections={setConnections}
           selectedNode={selectedNode}
           setSelectedNode={setSelectedNode}
         />

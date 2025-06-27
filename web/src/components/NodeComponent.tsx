@@ -1,11 +1,14 @@
 'use client';
 
 import { WorkflowNode } from '@/types/workflow';
+import { useDraggable } from '@dnd-kit/core';
 
 interface NodeComponentProps {
   node: WorkflowNode;
   isSelected: boolean;
-  onDragStart: (event: React.MouseEvent) => void;
+  isConnecting: boolean;
+  onStartConnection: (nodeId: string, position: { x: number; y: number }) => void;
+  onCompleteConnection: (targetNodeId: string) => void;
   onClick: () => void;
 }
 
@@ -46,25 +49,58 @@ const formatNodeTitle = (type: string) => {
   return type.split('-').map(word => word.charAt(0).toUpperCase() + word.slice(1)).join(' ');
 };
 
-export default function NodeComponent({ node, isSelected, onDragStart, onClick }: NodeComponentProps) {
+export default function NodeComponent({ 
+  node, 
+  isSelected, 
+  isConnecting, 
+  onStartConnection, 
+  onCompleteConnection, 
+  onClick 
+}: NodeComponentProps) {
+  const { attributes, listeners, setNodeRef, transform, isDragging } = useDraggable({
+    id: node.id,
+  });
+
+  const style = transform ? {
+    transform: `translate3d(${transform.x}px, ${transform.y}px, 0)`,
+  } : undefined;
+
+  const handleConnectionClick = (event: React.MouseEvent, isOutput: boolean) => {
+    event.stopPropagation();
+    
+    if (isConnecting) {
+      // Complete connection
+      onCompleteConnection(node.id);
+    } else if (isOutput) {
+      // Start connection from output
+      const position = {
+        x: node.position.x + 200, // Right side of node
+        y: node.position.y + 30,  // Middle of node
+      };
+      onStartConnection(node.id, position);
+    }
+  };
+
   return (
     <div
-      className={`absolute cursor-move select-none transition-all ${
-        isSelected ? 'ring-2 ring-blue-500 shadow-lg' : 'hover:shadow-md'
-      }`}
+      ref={setNodeRef}
       style={{
         left: node.position.x,
         top: node.position.y,
-        transform: isSelected ? 'scale(1.05)' : 'scale(1)',
+        ...style,
       }}
-      onMouseDown={onDragStart}
+      className={`absolute select-none transition-all ${
+        isSelected ? 'ring-2 ring-blue-500 shadow-lg z-20' : 'hover:shadow-md z-10'
+      } ${isDragging ? 'opacity-50' : ''}`}
+      {...listeners}
+      {...attributes}
       onClick={(e) => {
         e.stopPropagation();
         onClick();
       }}
     >
       <div className={`
-        min-w-[200px] p-4 rounded-lg border-2 bg-white shadow-sm
+        min-w-[200px] p-4 rounded-lg border-2 bg-white shadow-sm cursor-grab active:cursor-grabbing
         ${getNodeColor(node.type)}
       `}>
         <div className="flex items-center space-x-3">
@@ -78,8 +114,27 @@ export default function NodeComponent({ node, isSelected, onDragStart, onClick }
         </div>
         
         {/* Connection points */}
-        <div className="absolute -right-2 top-1/2 transform -translate-y-1/2 w-4 h-4 bg-white border-2 border-gray-300 rounded-full hover:border-blue-500"></div>
-        <div className="absolute -left-2 top-1/2 transform -translate-y-1/2 w-4 h-4 bg-white border-2 border-gray-300 rounded-full hover:border-blue-500"></div>
+        {/* Output connection point (right side) */}
+        <div 
+          className={`absolute -right-2 top-1/2 transform -translate-y-1/2 w-4 h-4 bg-white border-2 rounded-full cursor-pointer transition-colors ${
+            isConnecting 
+              ? 'border-gray-300 hover:border-gray-400' 
+              : 'border-blue-300 hover:border-blue-500'
+          }`}
+          onClick={(e) => handleConnectionClick(e, true)}
+          title="Output - Click to start connection"
+        />
+        
+        {/* Input connection point (left side) */}
+        <div 
+          className={`absolute -left-2 top-1/2 transform -translate-y-1/2 w-4 h-4 bg-white border-2 rounded-full cursor-pointer transition-colors ${
+            isConnecting 
+              ? 'border-green-300 hover:border-green-500' 
+              : 'border-gray-300 hover:border-gray-400'
+          }`}
+          onClick={(e) => handleConnectionClick(e, false)}
+          title="Input - Click to complete connection"
+        />
       </div>
     </div>
   );
