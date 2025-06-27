@@ -1,55 +1,55 @@
 'use client';
 
 import { useState } from 'react';
-import { EventType, TriggerType } from '@/types/workflow';
+import { EventType, TriggerType, NodeType } from '@/types/workflow';
 
 interface SidebarProps {
   onAddNode: (type: EventType, triggerType?: TriggerType) => void;
 }
 
 const triggers = [
-  { type: 'schedule' as TriggerType, label: 'Schedule', icon: '⏰', description: 'Run on a schedule' },
-  { type: 'webhook' as TriggerType, label: 'Webhook', icon: '🔗', description: 'Trigger via HTTP request' },
+  { type: NodeType.SCHEDULE, label: 'Schedule', icon: '⏰', description: 'Run on a schedule' },
+  { type: NodeType.WEBHOOK, label: 'Webhook', icon: '🔗', description: 'Trigger via HTTP request' },
 ];
 
 const databases = [
-  { type: 'postgres' as EventType, label: 'PostgreSQL', icon: '🐘' },
-  { type: 'mysql' as EventType, label: 'MySQL', icon: '🐬' },
-  { type: 'mariadb' as EventType, label: 'MariaDB', icon: '🗃️' },
-  { type: 'tidb' as EventType, label: 'TiDB', icon: '⚡' },
-  { type: 'neon' as EventType, label: 'Neon', icon: '🌟' },
-  { type: 'mongodb' as EventType, label: 'MongoDB', icon: '🍃' },
-  { type: 'snowflake' as EventType, label: 'Snowflake', icon: '❄️' },
-  { type: 'supabase' as EventType, label: 'Supabase', icon: '⚡' },
-  { type: 'clickhouse' as EventType, label: 'ClickHouse', icon: '📊' },
-  { type: 'hydra' as EventType, label: 'Hydra', icon: '🐍' },
+  { type: NodeType.POSTGRES, label: 'PostgreSQL', icon: '🐘' },
+  { type: NodeType.MYSQL, label: 'MySQL', icon: '🐬' },
+  { type: NodeType.MARIADB, label: 'MariaDB', icon: '🗃️' },
+  { type: NodeType.TIDB, label: 'TiDB', icon: '⚡' },
+  { type: NodeType.NEON, label: 'Neon', icon: '🌟' },
+  { type: NodeType.MONGODB, label: 'MongoDB', icon: '🍃' },
+  { type: NodeType.SNOWFLAKE, label: 'Snowflake', icon: '❄️' },
+  { type: NodeType.SUPABASE, label: 'Supabase', icon: '⚡' },
+  { type: NodeType.CLICKHOUSE, label: 'ClickHouse', icon: '📊' },
+  { type: NodeType.HYDRA, label: 'Hydra', icon: '🐍' },
 ];
 
 const apis = [
-  { type: 'rest-api' as EventType, label: 'REST API', icon: '🌐' },
-  { type: 'graphql' as EventType, label: 'GraphQL', icon: '📋' },
+  { type: NodeType.REST_API, label: 'REST API', icon: '🌐' },
+  { type: NodeType.GRAPHQL, label: 'GraphQL', icon: '📋' },
 ];
 
 const actions = [
-  { type: 'ai-agent' as EventType, label: 'AI Agent', icon: '🤖' },
-  { type: 'transformer' as EventType, label: 'Transformer', icon: '⚙️' },
-  { type: 'condition' as EventType, label: 'Condition', icon: '🔀' },
-  { type: 'loop' as EventType, label: 'Loop', icon: '🔄' },
-  { type: 'response' as EventType, label: 'Response', icon: '📤' },
-  { type: 'error-handler' as EventType, label: 'Error Handler', icon: '⚠️' },
+  { type: NodeType.AI_AGENT, label: 'AI Agent', icon: '🤖' },
+  { type: NodeType.TRANSFORMER, label: 'Transformer', icon: '⚙️' },
+  { type: NodeType.CONDITION, label: 'Condition', icon: '🔀' },
+  { type: NodeType.LOOP, label: 'Loop', icon: '🔄' },
+  { type: NodeType.RESPONSE, label: 'Response', icon: '📤' },
+  { type: NodeType.ERROR_HANDLER, label: 'Error Handler', icon: '⚠️' },
 ];
 
 export default function Sidebar({ onAddNode }: SidebarProps) {
   const [activeTab, setActiveTab] = useState<'triggers' | 'databases' | 'apis' | 'actions'>('triggers');
 
-  const renderNodeList = (nodes: { type: EventType | TriggerType; label: string; icon: string; description?: string }[], isTrigger = false) => (
+  const renderNodeList = (nodes: { type: EventType; label: string; icon: string; description?: string }[], isTrigger = false) => (
     <div className="space-y-2">
       {nodes.map((node) => (
         <button
           key={node.type}
           onClick={() => isTrigger 
-            ? onAddNode('schedule' as EventType, node.type as TriggerType) 
-            : onAddNode(node.type as EventType)
+            ? onAddNode(node.type, node.type as TriggerType) 
+            : onAddNode(node.type)
           }
           className="w-full p-3 text-left bg-white border border-gray-200 rounded-lg hover:border-blue-300 hover:shadow-sm transition-all group"
         >

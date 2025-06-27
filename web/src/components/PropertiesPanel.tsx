@@ -1,6 +1,6 @@
 'use client';
 
-import { WorkflowNode } from '@/types/workflow';
+import { WorkflowNode, NodeType } from '@/types/workflow';
 
 interface PropertiesPanelProps {
   node: WorkflowNode | null;
@@ -75,6 +75,56 @@ export default function PropertiesPanel({ node, onUpdateNode }: PropertiesPanelP
     </div>
   );
 
+  const renderWebhookConfig = () => (
+    <div className="space-y-4">
+      <div>
+        <label className="block text-sm font-medium text-gray-700 mb-2">Webhook URL</label>
+        <div className="flex items-center space-x-2">
+          <input
+            type="text"
+            value={`https://your-domain.com/webhook/${node.id}`}
+            readOnly
+            className="flex-1 px-3 py-2 border border-gray-300 rounded-md bg-gray-50 text-gray-600 text-sm"
+          />
+          <button 
+            className="px-3 py-2 text-sm bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors"
+            onClick={() => navigator.clipboard.writeText(`https://your-domain.com/webhook/${node.id}`)}
+          >
+            Copy
+          </button>
+        </div>
+        <p className="text-xs text-gray-500 mt-1">This URL will trigger your workflow when called</p>
+      </div>
+      <div>
+        <label className="block text-sm font-medium text-gray-700 mb-2">HTTP Method</label>
+        <select className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white text-gray-900">
+          <option>POST</option>
+          <option>GET</option>
+          <option>PUT</option>
+          <option>PATCH</option>
+        </select>
+      </div>
+      <div>
+        <label className="block text-sm font-medium text-gray-700 mb-2">Authentication</label>
+        <select className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white text-gray-900">
+          <option>None</option>
+          <option>API Key</option>
+          <option>Bearer Token</option>
+          <option>Basic Auth</option>
+        </select>
+      </div>
+      <div>
+        <label className="block text-sm font-medium text-gray-700 mb-2">Expected Content Type</label>
+        <select className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white text-gray-900">
+          <option>application/json</option>
+          <option>application/x-www-form-urlencoded</option>
+          <option>text/plain</option>
+          <option>application/xml</option>
+        </select>
+      </div>
+    </div>
+  );
+
   const renderScheduleConfig = () => (
     <div className="space-y-4">
       <div>
@@ -143,25 +193,27 @@ function transform(input) {
 
   const renderConfig = () => {
     switch (node.type) {
-      case 'schedule':
+      case NodeType.WEBHOOK:
+        return renderWebhookConfig();
+      case NodeType.SCHEDULE:
         return renderScheduleConfig();
-      case 'postgres':
-      case 'mysql':
-      case 'mariadb':
-      case 'tidb':
-      case 'neon':
-      case 'mongodb':
-      case 'snowflake':
-      case 'supabase':
-      case 'clickhouse':
-      case 'hydra':
+      case NodeType.POSTGRES:
+      case NodeType.MYSQL:
+      case NodeType.MARIADB:
+      case NodeType.TIDB:
+      case NodeType.NEON:
+      case NodeType.MONGODB:
+      case NodeType.SNOWFLAKE:
+      case NodeType.SUPABASE:
+      case NodeType.CLICKHOUSE:
+      case NodeType.HYDRA:
         return renderDatabaseConfig();
-      case 'rest-api':
-      case 'graphql':
+      case NodeType.REST_API:
+      case NodeType.GRAPHQL:
         return renderAPIConfig();
-      case 'transformer':
+      case NodeType.TRANSFORMER:
         return renderTransformerConfig();
-      case 'condition':
+      case NodeType.CONDITION:
         return renderConditionConfig();
       default:
         return (

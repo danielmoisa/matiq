@@ -1,26 +1,36 @@
+export enum NodeType {
+  // Triggers
+  SCHEDULE = 'schedule',
+  WEBHOOK = 'webhook',
+  
+  // Databases
+  POSTGRES = 'postgres',
+  MYSQL = 'mysql',
+  MARIADB = 'mariadb',
+  TIDB = 'tidb',
+  NEON = 'neon',
+  MONGODB = 'mongodb',
+  SNOWFLAKE = 'snowflake',
+  SUPABASE = 'supabase',
+  CLICKHOUSE = 'clickhouse',
+  HYDRA = 'hydra',
+  
+  // APIs
+  REST_API = 'rest-api',
+  GRAPHQL = 'graphql',
+  
+  // Actions
+  AI_AGENT = 'ai-agent',
+  TRANSFORMER = 'transformer',
+  CONDITION = 'condition',
+  LOOP = 'loop',
+  RESPONSE = 'response',
+  ERROR_HANDLER = 'error-handler'
+}
+
 export type TriggerType = 'schedule' | 'webhook';
 
-export type EventType = 
-  | 'schedule'
-  | 'webhook'
-  | 'postgres' 
-  | 'mysql' 
-  | 'mariadb' 
-  | 'tidb' 
-  | 'neon' 
-  | 'mongodb' 
-  | 'snowflake' 
-  | 'supabase' 
-  | 'clickhouse' 
-  | 'hydra'
-  | 'rest-api'
-  | 'graphql'
-  | 'ai-agent'
-  | 'transformer'
-  | 'condition'
-  | 'loop'
-  | 'response'
-  | 'error-handler';
+export type EventType = NodeType;
 
 export interface Position {
   x: number;

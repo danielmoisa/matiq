@@ -1,6 +1,6 @@
 'use client';
 
-import { WorkflowNode } from '@/types/workflow';
+import { WorkflowNode, NodeType } from '@/types/workflow';
 import { useDraggable } from '@dnd-kit/core';
 
 interface NodeComponentProps {
@@ -14,34 +14,34 @@ interface NodeComponentProps {
 
 const getNodeIcon = (type: string) => {
   const icons: Record<string, string> = {
-    'schedule': '⏰',
-    'webhook': '🔗',
-    'postgres': '🐘',
-    'mysql': '🐬',
-    'mariadb': '🗃️',
-    'tidb': '⚡',
-    'neon': '🌟',
-    'mongodb': '🍃',
-    'snowflake': '❄️',
-    'supabase': '⚡',
-    'clickhouse': '📊',
-    'hydra': '🐍',
-    'rest-api': '🌐',
-    'graphql': '📋',
-    'ai-agent': '🤖',
-    'transformer': '⚙️',
-    'condition': '🔀',
-    'loop': '🔄',
-    'response': '📤',
-    'error-handler': '⚠️',
+    [NodeType.SCHEDULE]: '⏰',
+    [NodeType.WEBHOOK]: '🔗',
+    [NodeType.POSTGRES]: '🐘',
+    [NodeType.MYSQL]: '🐬',
+    [NodeType.MARIADB]: '🗃️',
+    [NodeType.TIDB]: '⚡',
+    [NodeType.NEON]: '🌟',
+    [NodeType.MONGODB]: '🍃',
+    [NodeType.SNOWFLAKE]: '❄️',
+    [NodeType.SUPABASE]: '⚡',
+    [NodeType.CLICKHOUSE]: '📊',
+    [NodeType.HYDRA]: '🐍',
+    [NodeType.REST_API]: '🌐',
+    [NodeType.GRAPHQL]: '📋',
+    [NodeType.AI_AGENT]: '🤖',
+    [NodeType.TRANSFORMER]: '⚙️',
+    [NodeType.CONDITION]: '🔀',
+    [NodeType.LOOP]: '🔄',
+    [NodeType.RESPONSE]: '📤',
+    [NodeType.ERROR_HANDLER]: '⚠️',
   };
   return icons[type] || '📦';
 };
 
 const getNodeColor = (type: string) => {
-  if (['schedule', 'webhook'].includes(type)) return 'bg-green-100 border-green-300 text-green-800';
-  if (['postgres', 'mysql', 'mariadb', 'tidb', 'neon', 'mongodb', 'snowflake', 'supabase', 'clickhouse', 'hydra'].includes(type)) return 'bg-blue-100 border-blue-300 text-blue-800';
-  if (['rest-api', 'graphql'].includes(type)) return 'bg-purple-100 border-purple-300 text-purple-800';
+  if ([NodeType.SCHEDULE, NodeType.WEBHOOK].includes(type as NodeType)) return 'bg-green-100 border-green-300 text-green-800';
+  if ([NodeType.POSTGRES, NodeType.MYSQL, NodeType.MARIADB, NodeType.TIDB, NodeType.NEON, NodeType.MONGODB, NodeType.SNOWFLAKE, NodeType.SUPABASE, NodeType.CLICKHOUSE, NodeType.HYDRA].includes(type as NodeType)) return 'bg-blue-100 border-blue-300 text-blue-800';
+  if ([NodeType.REST_API, NodeType.GRAPHQL].includes(type as NodeType)) return 'bg-purple-100 border-purple-300 text-purple-800';
   return 'bg-gray-100 border-gray-300 text-gray-800';
 };
 
