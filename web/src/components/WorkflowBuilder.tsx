@@ -52,7 +52,19 @@ export default function WorkflowBuilder({ workflowId }: WorkflowBuilderProps) {
 
   return (
     <div className="h-screen flex flex-col">
-      <Header />
+      <Header 
+        workflowName={workflow?.name || 'Untitled Workflow'}
+        onWorkflowNameChange={(name) => {
+          // TODO: Update workflow name through API
+          console.log('Updating workflow name to:', name);
+        }}
+        onSave={saveWorkflow}
+        onPublish={() => {
+          // TODO: Implement publish functionality
+          console.log('Publishing workflow...');
+        }}
+        saving={loading}
+      />
       <div className="flex flex-1">
         <Sidebar onAddNode={addNode} />
         <Canvas 

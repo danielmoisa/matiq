@@ -59,6 +59,7 @@ export interface Workflow {
   nodes: WorkflowNode[];
   connections: Connection[];
   isActive: boolean;
-  createdAt: Date;
-  updatedAt: Date;
+  status: 'active' | 'draft' | 'paused' | 'error';
+  createdAt: string;
+  updatedAt: string;
 }
