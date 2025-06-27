@@ -1,17 +1,32 @@
 'use client';
 
-import { useState } from 'react';
-
+import { useState, useEffect } from 'react';
+import { useWorkflow } from '@/hooks/useWorkflow';
 import PropertiesPanel from './PropertiesPanel';
-import { WorkflowNode, Connection, TriggerType, EventType } from '@/types/workflow';
+import { WorkflowNode, TriggerType, EventType } from '@/types/workflow';
 import Header from './Header';
 import Sidebar from './Sidebar';
 import Canvas from './Canvas';
 
-export default function WorkflowBuilder() {
-  const [nodes, setNodes] = useState<WorkflowNode[]>([]);
-  const [connections, setConnections] = useState<Connection[]>([]);
+interface WorkflowBuilderProps {
+  workflowId?: string;
+}
+
+export default function WorkflowBuilder({ workflowId }: WorkflowBuilderProps) {
+  const {
+    workflow,
+    nodes,
+    setNodes,
+    connections,
+    setConnections,
+    loading,
+    error,
+    saveWorkflow,
+    createWorkflow
+  } = useWorkflow(workflowId);
+
   const [selectedNode, setSelectedNode] = useState<WorkflowNode | null>(null);
+  const [autoSave, setAutoSave] = useState(true);
 
   const addNode = (type: EventType, triggerType?: TriggerType) => {
     const newNode: WorkflowNode = {
