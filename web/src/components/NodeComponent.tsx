@@ -61,9 +61,14 @@ export default function NodeComponent({
     id: node.id,
   });
 
-  const style = transform ? {
-    transform: `translate3d(${transform.x}px, ${transform.y}px, 0)`,
-  } : undefined;
+  // During dragging, use transform. After dragging, the position is updated and transform is reset
+  const finalStyle = {
+    left: node.position.x,
+    top: node.position.y,
+    transform: transform ? `translate3d(${transform.x}px, ${transform.y}px, 0)` : 'translate3d(0px, 0px, 0)',
+    // Remove transition during dragging to prevent conflicts
+    transition: isDragging ? 'none' : 'none',
+  };
 
   const handleConnectionClick = (event: React.MouseEvent, isOutput: boolean) => {
     event.stopPropagation();
@@ -84,14 +89,10 @@ export default function NodeComponent({
   return (
     <div
       ref={setNodeRef}
-      style={{
-        left: node.position.x,
-        top: node.position.y,
-        ...style,
-      }}
-      className={`absolute select-none transition-all ${
+      style={finalStyle}
+      className={`absolute select-none ${
         isSelected ? 'ring-2 ring-blue-500 shadow-lg z-20' : 'hover:shadow-md z-10'
-      } ${isDragging ? 'opacity-50' : ''}`}
+      } ${isDragging ? 'opacity-80 z-30' : ''}`}
       {...listeners}
       {...attributes}
       onClick={(e) => {

@@ -33,6 +33,7 @@ export default function Canvas({
 }: CanvasProps) {
   const canvasRef = useRef<HTMLDivElement>(null);
   const [activeId, setActiveId] = useState<string | null>(null);
+  const [dragTransform, setDragTransform] = useState<{ x: number; y: number } | null>(null);
   const [isConnecting, setIsConnecting] = useState(false);
   const [connectionStart, setConnectionStart] = useState<{ nodeId: string; position: { x: number; y: number } } | null>(null);
   const [tempConnection, setTempConnection] = useState<{ start: { x: number; y: number }; end: { x: number; y: number } } | null>(null);
@@ -40,31 +41,48 @@ export default function Canvas({
   const sensors = useSensors(
     useSensor(PointerSensor, {
       activationConstraint: {
-        distance: 8,
+        distance: 1, // Very small distance for immediate response
       },
     })
   );
 
   const handleDragStart = (event: DragStartEvent) => {
     setActiveId(event.active.id as string);
+    setDragTransform({ x: 0, y: 0 });
     const node = nodes.find(n => n.id === event.active.id);
     if (node) {
       setSelectedNode(node);
     }
   };
 
+  const handleDragMove = (event: { delta: { x: number; y: number } }) => {
+    if (event.delta) {
+      setDragTransform(event.delta);
+    }
+  };
+
   const handleDragEnd = (event: DragEndEvent) => {
     const { active, delta } = event;
     
+    // Only update if there was actual movement
     if (delta.x !== 0 || delta.y !== 0) {
-      setNodes(nodes.map(node => 
+      // Update node position immediately - no animation, no delay
+      const updatedNodes = nodes.map((node: WorkflowNode) => 
         node.id === active.id 
-          ? { ...node, position: { x: node.position.x + delta.x, y: node.position.y + delta.y } }
+          ? { 
+              ...node, 
+              position: { 
+                x: Math.max(0, node.position.x + delta.x), // Prevent negative positions
+                y: Math.max(0, node.position.y + delta.y) 
+              } 
+            }
           : node
-      ));
+      );
+      setNodes(updatedNodes);
     }
     
     setActiveId(null);
+    setDragTransform(null);
   };
 
   const handleStartConnection = (nodeId: string, position: { x: number; y: number }) => {
@@ -89,7 +107,20 @@ export default function Canvas({
         x: event.clientX - rect.left,
         y: event.clientY - rect.top,
       };
-      setTempConnection({ ...tempConnection, end });
+      
+      // Update start position if the source node is being dragged
+      let start = tempConnection.start;
+      if (connectionStart && connectionStart.nodeId === activeId && dragTransform) {
+        const sourceNode = nodes.find(n => n.id === connectionStart.nodeId);
+        if (sourceNode) {
+          start = {
+            x: sourceNode.position.x + 200 + dragTransform.x,
+            y: sourceNode.position.y + 40 + dragTransform.y,
+          };
+        }
+      }
+      
+      setTempConnection({ start, end });
     }
   };
 
@@ -124,6 +155,7 @@ export default function Canvas({
       <DndContext
         sensors={sensors}
         onDragStart={handleDragStart}
+        onDragMove={handleDragMove}
         onDragEnd={handleDragEnd}
         modifiers={[restrictToWindowEdges]}
       >
@@ -186,11 +218,22 @@ export default function Canvas({
               
               if (!sourceNode || !targetNode) return null;
               
+              // Calculate actual positions considering any active drag
+              const sourcePos = sourceNode.id === activeId && dragTransform ? {
+                x: sourceNode.position.x + dragTransform.x,
+                y: sourceNode.position.y + dragTransform.y
+              } : sourceNode.position;
+              
+              const targetPos = targetNode.id === activeId && dragTransform ? {
+                x: targetNode.position.x + dragTransform.x,
+                y: targetNode.position.y + dragTransform.y
+              } : targetNode.position;
+              
               // Calculate connection points (from right edge of source to left edge of target)
-              const sourceX = sourceNode.position.x + 200; // Right edge of source node
-              const sourceY = sourceNode.position.y + 40; // Middle of source node
-              const targetX = targetNode.position.x; // Left edge of target node
-              const targetY = targetNode.position.y + 40; // Middle of target node
+              const sourceX = sourcePos.x + 200; // Right edge of source node
+              const sourceY = sourcePos.y + 40; // Middle of source node
+              const targetX = targetPos.x; // Left edge of target node
+              const targetY = targetPos.y + 40; // Middle of target node
               
               // Create a curved path for better visual appeal
               const controlPoint1X = sourceX + Math.min(100, Math.abs(targetX - sourceX) / 3);
@@ -269,8 +312,15 @@ export default function Canvas({
         
         <DragOverlay>
           {activeId ? (
-            <div className="bg-white rounded-lg shadow-lg border-2 border-blue-500 p-3 min-w-[200px] opacity-80">
-              <div className="font-medium">{nodes.find(n => n.id === activeId)?.type}</div>
+            <div className="opacity-60 pointer-events-none">
+              {/* Render a lightweight version of the node */}
+              <div className="min-w-[200px] p-4 rounded-lg border-2 bg-white shadow-lg border-blue-500">
+                <div className="font-medium text-sm">
+                  {nodes.find(n => n.id === activeId)?.type?.split('-').map(word => 
+                    word.charAt(0).toUpperCase() + word.slice(1)
+                  ).join(' ')}
+                </div>
+              </div>
             </div>
           ) : null}
         </DragOverlay>
