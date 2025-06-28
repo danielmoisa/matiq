@@ -38,7 +38,7 @@ func GetInstance() *Config {
 type Config struct {
 	// server config
 	ServerHost         string `env:"WF_SERVER_HOST" envDefault:"0.0.0.0"`
-	ServerPort         string `env:"WF_SERVER_PORT" envDefault:"8001"`
+	ServerPort         string `env:"WF_SERVER_PORT" envDefault:"8080"`
 	InternalServerPort string `env:"WF_SERVER_INTERNAL_PORT" envDefault:"9005"`
 	ServerMode         string `env:"WF_SERVER_MODE" envDefault:"debug"`
 	DeployMode         string `env:"WF_DEPLOY_MODE" envDefault:"self-host"`
@@ -61,13 +61,13 @@ type Config struct {
 	RandomKey string `env:"WF_RANDOM_KEY"  envDefault:"abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789"`
 	// storage config
 	PostgresAddr     string `env:"WF_PG_ADDR" envDefault:"localhost"`
-	PostgresPort     string `env:"WF_PG_PORT" envDefault:"5433"`
-	PostgresUser     string `env:"WF_PG_USER" envDefault:"wf_builder"`
-	PostgresPassword string `env:"WF_PG_PASSWORD" envDefault:"71De5JllWSetLYU"`
-	PostgresDatabase string `env:"WF_PG_DATABASE" envDefault:"wf_builder"`
+	PostgresPort     string `env:"WF_PG_PORT" envDefault:"5435"`
+	PostgresUser     string `env:"WF_PG_USER" envDefault:"workflow"`
+	PostgresPassword string `env:"WF_PG_PASSWORD" envDefault:"workflow2025"`
+	PostgresDatabase string `env:"WF_PG_DATABASE" envDefault:"workflow"`
 	// cache config
 	RedisAddr     string `env:"WF_REDIS_ADDR" envDefault:"localhost"`
-	RedisPort     string `env:"WF_REDIS_PORT" envDefault:"6378"`
+	RedisPort     string `env:"WF_REDIS_PORT" envDefault:"6375"`
 	RedisPassword string `env:"WF_REDIS_PASSWORD" envDefault:"wf2025"`
 	RedisDatabase int    `env:"WF_REDIS_DATABASE" envDefault:"0"`
 	// drive config

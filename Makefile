@@ -2,6 +2,9 @@
 
 all: build
 
+run:
+	go run ./cmd/workflow-builder-backend/main.go
+
 build: build-http-server build-websocket-server build-http-server-internal
 
 build-http-server:

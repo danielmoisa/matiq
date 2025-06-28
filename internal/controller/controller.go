@@ -15,11 +15,11 @@ type Controller struct {
 	// AttributeGroup        *accesscontrol.AttributeGroup
 }
 
-func NewControllerForBackend(repository *repository.Repository, cache *cache.Cache, drive *drive.Drive) *Controller { // TODO: attrg *accesscontrol.AttributeGroup, validator *tokenvalidator.RequestTokenValidator
+func NewControllerForBackend(repository *repository.Repository, cache *cache.Cache) *Controller { // TODO: attrg *accesscontrol.AttributeGroup, validator *tokenvalidator.RequestTokenValidator
 	return &Controller{
 		Repository: repository,
 		Cache:      cache,
-		Drive:      drive,
+		// Drive:      drive,
 		// RequestTokenValidator: validator,
 		// AttributeGroup:        attrg,
 	}
