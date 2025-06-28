@@ -15,9 +15,9 @@ const (
 )
 
 type Workflow struct {
-	ID          int                    `gorm:"column:id;type:bigserial;primary_key"`
+	ID          int                    `gorm:"column:id;type:bigint;primary_key"`
 	UID         uuid.UUID              `gorm:"column:uid;type:uuid;not null"`
-	TeamID      int                    `gorm:"column:team_id;type:bigserial"`
+	TeamID      int                    `gorm:"column:team_id;type:bigint"`
 	WorkflowID  int                    `gorm:"column:workflow_id;type:bigint;not null"`
 	Version     int                    `gorm:"column:version;type:bigint;not null"`
 	ResourceID  int                    `gorm:"column:resource_id;type:bigint;not null"`

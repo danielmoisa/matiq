@@ -23,7 +23,7 @@ func (r *Router) RegisterRouters(engine *gin.Engine) {
 	routerGroup := engine.Group("/api/v1")
 
 	healthRouter := routerGroup.Group("/health")
-	flowActionRouter := routerGroup.Group("/teams/:teamID/workflow/:workflowID/flowActions")
+	workflowRouter := routerGroup.Group("/teams/:teamID/workflow")
 
 	// flowActionRouter.Use(remotejwtauth.RemoteJWTAuth())
 
@@ -31,8 +31,8 @@ func (r *Router) RegisterRouters(engine *gin.Engine) {
 	healthRouter.GET("", r.Controller.GetHealth)
 
 	// flow action routers
-	flowActionRouter.POST("", r.Controller.CreateWorkflow)
-	// flowActionRouter.GET("/:flowActionID", r.Controller.GetFlowAction)
+	workflowRouter.POST("", r.Controller.CreateWorkflow)
+	workflowRouter.GET("/:workflowID", r.Controller.GetWorkflow)
 	// flowActionRouter.PUT("/:flowActionID", r.Controller.UpdateFlowAction)
 	// flowActionRouter.DELETE("/:flowActionID", r.Controller.DeleteFlowAction)
 	// flowActionRouter.POST("/:flowActionID/run", r.Controller.RunFlowAction)

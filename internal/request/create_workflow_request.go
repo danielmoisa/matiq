@@ -49,7 +49,7 @@ type CreateWorkflowRequest struct {
 	Config            map[string]interface{} `json:"config"`
 }
 
-func NewCreateFlowActionRequest() *CreateWorkflowRequest {
+func NewCreateWorkflowRequest() *CreateWorkflowRequest {
 	return &CreateWorkflowRequest{}
 }
 

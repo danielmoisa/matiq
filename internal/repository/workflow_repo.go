@@ -39,7 +39,7 @@ func (impl *WorkflowRepository) UpdateWholeFlowAction(action *model.Workflow) er
 	return nil
 }
 
-func (impl *WorkflowRepository) RetrieveFlowActionByTeamIDAndID(teamID int, workflowID int) (*model.Workflow, error) {
+func (impl *WorkflowRepository) RetrieveWorkflowByTeamIDAndID(teamID int, workflowID int) (*model.Workflow, error) {
 	var action *model.Workflow
 	if err := impl.db.Where("team_id = ? AND id = ?", teamID, workflowID).Find(&action).Error; err != nil {
 		return nil, err
