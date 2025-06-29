@@ -1,29 +1,20 @@
 'use client';
 
-import { useState } from 'react';
 import Link from 'next/link';
 
 interface HeaderProps {
   workflowName?: string;
-  onWorkflowNameChange?: (name: string) => void;
   onSave?: () => void;
   onPublish?: () => void;
   saving?: boolean;
 }
 
 export default function Header({ 
-  workflowName = 'Untitled Workflow',
-  onWorkflowNameChange,
+  workflowName,
   onSave,
   onPublish,
   saving = false
 }: HeaderProps) {
-  const [localName, setLocalName] = useState(workflowName);
-
-  const handleNameChange = (name: string) => {
-    setLocalName(name);
-    onWorkflowNameChange?.(name);
-  };
 
   return (
     <header className="bg-white border-b border-gray-200 px-6 py-4">
@@ -46,13 +37,9 @@ export default function Header({
             <span>Edit</span>
           </div>
           <div className="h-6 w-px bg-gray-300" />
-          <input
-            type="text"
-            value={localName}
-            onChange={(e) => handleNameChange(e.target.value)}
-            className="bg-transparent text-lg font-medium text-gray-900 border-none outline-none focus:bg-gray-50 px-2 py-1 rounded"
-            placeholder="Workflow name..."
-          />
+          <h2 className="text-lg font-medium text-gray-900">
+            {workflowName || 'Untitled Workflow'}
+          </h2>
         </div>
         
         <div className="flex items-center space-x-3">

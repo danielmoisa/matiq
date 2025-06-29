@@ -48,6 +48,7 @@ export default function WorkflowBuilder({ workflowId }: WorkflowBuilderProps) {
     ));
   };
 
+
   return (
     <div className="h-screen flex flex-col">
       {error && (
@@ -67,11 +68,7 @@ export default function WorkflowBuilder({ workflowId }: WorkflowBuilderProps) {
         </div>
       )}
       <Header 
-        workflowName={workflow?.name || 'Untitled Workflow'}
-        onWorkflowNameChange={(name) => {
-          // TODO: Update workflow name through API
-          console.log('Updating workflow name to:', name);
-        }}
+        workflowName={workflow?.name}
         onSave={saveWorkflow}
         onPublish={() => {
           // TODO: Implement publish functionality

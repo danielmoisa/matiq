@@ -13,31 +13,56 @@ import {
 export class WorkflowService {
   
   // Get all workflows for a team
-  static async getWorkflows(teamId: number): Promise<Workflow[]> { 
-    const response = await apiClient.get<ApiResponse<WorkflowBackend[]>>(`/teams/${teamId}/workflow`);
-    const backendWorkflows = response.data || [];
-    
-    // Convert backend workflows to frontend format
-    return backendWorkflows.map(convertBackendToFrontend);
+  static async getWorkflows(teamId: number = 1): Promise<Workflow[]> { 
+    try {
+      const response = await apiClient.get<ApiResponse<WorkflowBackend[]>>(`/teams/${teamId}/workflow`);
+      const backendWorkflows = response.data || [];
+      
+      // Convert backend workflows to frontend format, filtering out any invalid ones
+      return backendWorkflows
+        .filter(workflow => workflow != null) // Filter out null/undefined workflows
+        .map(convertBackendToFrontend);
+    } catch (error) {
+      console.error('Failed to fetch workflows:', error);
+      throw new Error(error instanceof Error ? error.message : 'Failed to fetch workflows');
+    }
   }
 
   // Get a specific workflow by team ID and workflow ID
-  static async getWorkflow(workflowId: string, teamId: number): Promise<Workflow> { 
-    const response = await apiClient.get<ApiResponse<WorkflowBackend>>(`/teams/2324354/workflow/${workflowId}`); // todo: Replace with actual team ID
-    const backendWorkflow = response.data;
-    
-    // Convert backend workflow to frontend format
-    return convertBackendToFrontend(backendWorkflow);
+  static async getWorkflow(workflowId: string, teamId: number = 1): Promise<Workflow> { 
+    try {
+      const response = await apiClient.get<WorkflowBackend>(`/teams/${teamId}/workflow/${workflowId}`);
+      const backendWorkflow = response;
+      
+      if (!backendWorkflow) {
+        throw new Error('Workflow not found or response is empty');
+      }
+      
+      // Convert backend workflow to frontend format
+      return convertBackendToFrontend(backendWorkflow);
+    } catch (error) {
+      console.error(`Failed to fetch workflow ${workflowId}:`, error);
+      throw new Error(error instanceof Error ? error.message : 'Failed to fetch workflow');
+    }
   }
 
   // Create a new workflow
   static async createWorkflow(workflow: Partial<Workflow>, teamId: number = 1): Promise<Workflow> {
-    const requestData = convertFrontendToBackendRequest(workflow);
-    
-    const response = await apiClient.post<ApiResponse<WorkflowBackend>>(`/teams/${teamId}/workflow`, requestData);
-    const backendWorkflow = response.data;
-    
-    return convertBackendToFrontend(backendWorkflow);
+    try {
+      const requestData = convertFrontendToBackendRequest(workflow);
+      
+      const response = await apiClient.post<ApiResponse<WorkflowBackend>>(`/teams/${teamId}/workflow`, requestData);
+      const backendWorkflow = response.data;
+      
+      if (!backendWorkflow) {
+        throw new Error('Create workflow response is empty');
+      }
+      
+      return convertBackendToFrontend(backendWorkflow);
+    } catch (error) {
+      console.error('Failed to create workflow:', error);
+      throw new Error(error instanceof Error ? error.message : 'Failed to create workflow');
+    }
   }
 
   // Update an existing workflow
@@ -46,15 +71,24 @@ export class WorkflowService {
     workflow: Partial<Workflow>,
     teamId: number = 1
   ): Promise<Workflow> {
-    const requestData = convertFrontendToBackendRequest(workflow);
-    
-    const response = await apiClient.put<ApiResponse<WorkflowBackend>>(
-      `/teams/${teamId}/workflow/${workflowId}`, 
-      requestData
-    );
-    const backendWorkflow = response.data;
-    
-    return convertBackendToFrontend(backendWorkflow);
+    try {
+      const requestData = convertFrontendToBackendRequest(workflow);
+      
+      const response = await apiClient.put<ApiResponse<WorkflowBackend>>(
+        `/teams/${teamId}/workflow/${workflowId}`, 
+        requestData
+      );
+      const backendWorkflow = response.data;
+      
+      if (!backendWorkflow) {
+        throw new Error('Update workflow response is empty');
+      }
+      
+      return convertBackendToFrontend(backendWorkflow);
+    } catch (error) {
+      console.error(`Failed to update workflow ${workflowId}:`, error);
+      throw new Error(error instanceof Error ? error.message : 'Failed to update workflow');
+    }
   }
 
   // Delete a workflow
@@ -102,19 +136,28 @@ export class WorkflowService {
     connections: Connection[],
     teamId: number = 1
   ): Promise<Workflow> {
-    const requestData = convertFrontendToBackendRequest(
-      { name: 'Updated Workflow' }, // Will be overridden by existing name
-      nodes,
-      connections
-    );
-    
-    const response = await apiClient.put<ApiResponse<WorkflowBackend>>(
-      `/teams/${teamId}/workflow/${workflowId}`,
-      requestData
-    );
-    const backendWorkflow = response.data;
-    
-    return convertBackendToFrontend(backendWorkflow);
+    try {
+      const requestData = convertFrontendToBackendRequest(
+        { name: 'Updated Workflow' }, // Will be overridden by existing name
+        nodes,
+        connections
+      );
+      
+      const response = await apiClient.put<ApiResponse<WorkflowBackend>>(
+        `/teams/${teamId}/workflow/${workflowId}`,
+        requestData
+      );
+      const backendWorkflow = response.data;
+      
+      if (!backendWorkflow) {
+        throw new Error('Save workflow response is empty');
+      }
+      
+      return convertBackendToFrontend(backendWorkflow);
+    } catch (error) {
+      console.error(`Failed to save workflow ${workflowId}:`, error);
+      throw new Error(error instanceof Error ? error.message : 'Failed to save workflow');
+    }
   }
 
   // Activate/Deactivate workflow (if backend supports this)
