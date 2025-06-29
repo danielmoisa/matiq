@@ -52,50 +52,54 @@ export interface Connection {
   targetId: string;
 }
 
-// Backend response structure (matches Go model)
+// Backend response structure (matches actual Go backend response)
 export interface WorkflowBackend {
-  id: number;                    // Backend primary key
   uid: string;                   // UUID from backend
-  teamId: number;               // Team ID
-  workflowId: number;           // Workflow ID within team
-  version: number;              // Version control
-  resourceId: number;           // Resource ID
-  name: string;                 // Workflow name (DisplayName in backend)
-  type: number;                 // Workflow type as integer
-  triggerMode: string;          // "schedule" | "webhook"
-  transformer: string;          // JSON string
-  template: string;             // JSON string containing nodes/connections
-  config: string;               // JSON string
+  teamID: string;               // Encoded team ID
+  version: number;              // Version number
+  resourceID: string;           // Encoded resource ID
+  displayName: string;          // Workflow name
+  workflowType: string;         // Workflow type as string
+  isVirtualResource: boolean;   // Virtual resource flag
+  content: {                    // Content containing nodes and connections
+    nodes: WorkflowNode[];
+    connections: Connection[];
+    resourceID: number;
+    runByAnonymous: boolean;
+    teamID: number;
+  };
+  transformer: unknown;         // Transformer data (can be null)
+  triggerMode: string;          // Trigger mode as string
+  template: unknown;            // Template data (can be null)
+  config: unknown;              // Config data (can be null)
   createdAt: string;            // ISO timestamp
-  createdBy: number;            // User ID
+  createdBy: string;            // Encoded user ID
   updatedAt: string;            // ISO timestamp
-  updatedBy: number;            // User ID
+  updatedBy: string;            // Encoded user ID
 }
 
 // Frontend-friendly workflow interface (converted from backend)
 export interface Workflow {
-  id: string;                   // Use workflowId as string
+  id: string;                   // Use resourceID as string
   name: string;
   description?: string;
   nodes: WorkflowNode[];
   connections: Connection[];
   isActive: boolean;
-  status: 'active' | 'draft' | 'paused' | 'error';
+  status: "active" | "draft" | "paused" | "error";
   triggerMode?: string;
   createdAt: string;
   updatedAt: string;
   // Backend fields for API calls
-  teamId?: number;
-  workflowId?: number;
+  uid?: string;
+  teamID?: string;
   version?: number;
-  resourceId?: number;
-  type?: number;
+  resourceID?: string;
+  workflowType?: string;
 }
 
-// Helper functions to convert between backend and frontend models
-
-// Template structure stored in backend's template JSON field
-interface WorkflowTemplate {
+// Template structure stored in backend content field
+interface WorkflowContent {
   nodes?: WorkflowNode[];
   connections?: Connection[];
   resourceID?: number;
@@ -104,44 +108,54 @@ interface WorkflowTemplate {
 }
 
 // Convert backend workflow to frontend workflow
-export function convertBackendToFrontend(backend: WorkflowBackend): Workflow {
-  // Parse template JSON to extract nodes and connections
+export function convertBackendToFrontend(backend: WorkflowBackend | null | undefined): Workflow {
+  // Handle undefined/null backend response
+  if (!backend) {
+    return {
+      id: 'unknown',
+      name: 'Unknown Workflow',
+      description: '',
+      nodes: [],
+      connections: [],
+      isActive: false,
+      status: 'error',
+      createdAt: new Date().toISOString(),
+      updatedAt: new Date().toISOString(),
+    };
+  }
+
+  // Extract nodes and connections from content
   let nodes: WorkflowNode[] = [];
   let connections: Connection[] = [];
   
-  if (backend.template) {
-    try {
-      const template: WorkflowTemplate = JSON.parse(backend.template);
-      nodes = template.nodes || [];
-      connections = template.connections || [];
-    } catch (error) {
-      console.warn('Failed to parse workflow template:', error);
-    }
+  if (backend.content) {
+    nodes = backend.content.nodes || [];
+    connections = backend.content.connections || [];
   }
 
-  // Determine status based on template content and trigger mode
-  let status: 'active' | 'draft' | 'paused' | 'error' = 'draft';
+  // Determine status based on content and trigger mode
+  let status: "active" | "draft" | "paused" | "error" = "draft";
   if (nodes.length > 0) {
-    status = 'active';
+    status = "active";
   }
 
   return {
-    id: backend.workflowId.toString(),
-    name: backend.name,
-    description: '', // Backend doesn't have description field
+    id: backend.resourceID || backend.uid || 'unknown', // Fallback to uid if resourceID missing
+    name: backend.displayName || 'Untitled Workflow',
+    description: "", // Backend does not have description field
     nodes,
     connections,
     isActive: nodes.length > 0, // Active if has nodes
     status,
     triggerMode: backend.triggerMode,
-    createdAt: backend.createdAt,
-    updatedAt: backend.updatedAt,
+    createdAt: backend.createdAt || new Date().toISOString(),
+    updatedAt: backend.updatedAt || new Date().toISOString(),
     // Keep backend fields for API calls
-    teamId: backend.teamId,
-    workflowId: backend.workflowId,
+    uid: backend.uid,
+    teamID: backend.teamID,
     version: backend.version,
-    resourceId: backend.resourceId,
-    type: backend.type,
+    resourceID: backend.resourceID,
+    workflowType: backend.workflowType,
   };
 }
 
@@ -152,27 +166,26 @@ export function convertFrontendToBackendRequest(
   connections: Connection[] = []
 ): {
   displayName: string;
+  workflowType: string;
   triggerMode: string;
-  template: string;
-  transformer: string;
-  config: string;
-  resourceId?: string;
-  workflowType?: string;
+  content: WorkflowContent;
+  transformer?: unknown;
+  config?: unknown;
 } {
-  // Create template JSON from nodes and connections
-  const template: WorkflowTemplate = {
+  // Create content object from nodes and connections
+  const content: WorkflowContent = {
     nodes,
     connections,
+    runByAnonymous: true,
   };
 
   return {
-    displayName: workflow.name || 'Untitled Workflow',
-    triggerMode: workflow.triggerMode || 'webhook',
-    template: JSON.stringify(template),
-    transformer: '{}', // Empty transformer for now
-    config: '{}', // Empty config for now
-    resourceId: workflow.resourceId?.toString() || '0',
-    workflowType: 'workflow', // Default type
+    displayName: workflow.name || "Untitled Workflow",
+    workflowType: workflow.workflowType || "restapi",
+    triggerMode: workflow.triggerMode || "1", // Backend expects string
+    content,
+    transformer: null,
+    config: null,
   };
 }
 

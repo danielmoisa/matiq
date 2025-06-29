@@ -112,7 +112,7 @@ export function useWorkflow(workflowId?: string) {
   // Load workflow on mount if ID provided
   useEffect(() => {
     if (workflowId) {
-      loadWorkflow(workflowId);
+      loadWorkflow(workflowId, 1); // Use default teamId = 1
     }
   }, [workflowId]);
 

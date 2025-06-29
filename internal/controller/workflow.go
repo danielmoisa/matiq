@@ -247,7 +247,6 @@ func (controller *Controller) GetWorkflow(c *gin.Context) {
 
 	// fetch data
 	workflow, errInGetAction := controller.Repository.WorkflowRepository.RetrieveWorkflowByTeamIDAndID(teamID, workflowID)
-	println("[GetWorkflow] teamID: ", teamID, ", workflowID: ", workflowID, ", workflow: ", workflow)
 	if errInGetAction != nil {
 		controller.FeedbackBadRequest(c, ERROR_FLAG_CAN_NOT_GET_WORKFLOW, "get workflow error: "+errInGetAction.Error())
 		return
