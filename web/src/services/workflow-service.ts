@@ -1,59 +1,86 @@
 import { apiClient } from './api-client';
-import { Workflow, WorkflowNode, Connection } from '@/types/workflow';
-
-// API Response types
-interface ApiResponse<T> {
-  success: boolean;
-  data: T;
-  message?: string;
-}
-
-interface ApiError {
-  success: false;
-  error: string;
-  message?: string;
-}
+import { 
+  Workflow, 
+  WorkflowNode, 
+  Connection, 
+  WorkflowBackend,
+  ApiResponse,
+  convertBackendToFrontend,
+  convertFrontendToBackendRequest
+} from '@/types/workflow';
 
 // Workflow API Service
 export class WorkflowService {
   
-  // Get all workflows
-  static async getWorkflows(): Promise<Workflow[]> {
-    const response = await apiClient.get<ApiResponse<Workflow[]>>('/workflows');
-    return response.data;
+  // Get all workflows for a team
+  static async getWorkflows(teamId: number): Promise<Workflow[]> { 
+    const response = await apiClient.get<ApiResponse<WorkflowBackend[]>>(`/teams/${teamId}/workflow`);
+    const backendWorkflows = response.data || [];
+    
+    // Convert backend workflows to frontend format
+    return backendWorkflows.map(convertBackendToFrontend);
   }
 
-  // Get a specific workflow by ID
-  static async getWorkflow(id: string): Promise<Workflow> {
-    const response = await apiClient.get<ApiResponse<Workflow>>(`/workflows/${id}`);
-    return response.data;
+  // Get a specific workflow by team ID and workflow ID
+  static async getWorkflow(workflowId: string, teamId: number): Promise<Workflow> { 
+    const response = await apiClient.get<ApiResponse<WorkflowBackend>>(`/teams/2324354/workflow/${workflowId}`); // todo: Replace with actual team ID
+    const backendWorkflow = response.data;
+    
+    // Convert backend workflow to frontend format
+    return convertBackendToFrontend(backendWorkflow);
   }
 
   // Create a new workflow
-  static async createWorkflow(workflow: Partial<Workflow>): Promise<Workflow> {
-    const response = await apiClient.post<ApiResponse<Workflow>>('/workflows', workflow);
-    return response.data;
+  static async createWorkflow(workflow: Partial<Workflow>, teamId: number = 1): Promise<Workflow> {
+    const requestData = convertFrontendToBackendRequest(workflow);
+    
+    const response = await apiClient.post<ApiResponse<WorkflowBackend>>(`/teams/${teamId}/workflow`, requestData);
+    const backendWorkflow = response.data;
+    
+    return convertBackendToFrontend(backendWorkflow);
   }
 
   // Update an existing workflow
-  static async updateWorkflow(id: string, workflow: Partial<Workflow>): Promise<Workflow> {
-    const response = await apiClient.put<ApiResponse<Workflow>>(`/workflows/${id}`, workflow);
-    return response.data;
+  static async updateWorkflow(
+    workflowId: string, 
+    workflow: Partial<Workflow>,
+    teamId: number = 1
+  ): Promise<Workflow> {
+    const requestData = convertFrontendToBackendRequest(workflow);
+    
+    const response = await apiClient.put<ApiResponse<WorkflowBackend>>(
+      `/teams/${teamId}/workflow/${workflowId}`, 
+      requestData
+    );
+    const backendWorkflow = response.data;
+    
+    return convertBackendToFrontend(backendWorkflow);
   }
 
   // Delete a workflow
-  static async deleteWorkflow(id: string): Promise<void> {
-    await apiClient.delete<ApiResponse<void>>(`/workflows/${id}`);
+  static async deleteWorkflow(workflowId: string, teamId: number = 1): Promise<void> {
+    await apiClient.delete<ApiResponse<void>>(`/teams/${teamId}/workflow/${workflowId}`);
   }
 
   // Execute a workflow
-  static async executeWorkflow(id: string, input?: Record<string, unknown>): Promise<{ executionId: string }> {
-    const response = await apiClient.post<ApiResponse<{ executionId: string }>>(`/workflows/${id}/execute`, { input });
+  static async executeWorkflow(
+    workflowId: string, 
+    input?: Record<string, unknown>,
+    teamId: number = 1
+  ): Promise<{ executionId: string }> {
+    const response = await apiClient.post<ApiResponse<{ executionId: string }>>(
+      `/teams/${teamId}/workflow/${workflowId}/execute`, 
+      { input }
+    );
     return response.data;
   }
 
   // Get workflow execution status
-  static async getExecutionStatus(workflowId: string, executionId: string): Promise<{
+  static async getExecutionStatus(
+    workflowId: string, 
+    executionId: string,
+    teamId: number = 1
+  ): Promise<{
     status: 'running' | 'completed' | 'failed' | 'cancelled';
     progress: number;
     result?: unknown;
@@ -64,33 +91,48 @@ export class WorkflowService {
       progress: number;
       result?: unknown;
       error?: string;
-    }>>(`/workflows/${workflowId}/executions/${executionId}`);
+    }>>(`/teams/${teamId}/workflow/${workflowId}/executions/${executionId}`);
     return response.data;
   }
 
   // Save workflow (nodes and connections)
   static async saveWorkflow(
-    id: string, 
+    workflowId: string, 
     nodes: WorkflowNode[], 
-    connections: Connection[]
+    connections: Connection[],
+    teamId: number = 1
   ): Promise<Workflow> {
-    const response = await apiClient.put<ApiResponse<Workflow>>(`/workflows/${id}`, {
+    const requestData = convertFrontendToBackendRequest(
+      { name: 'Updated Workflow' }, // Will be overridden by existing name
       nodes,
-      connections,
-      updatedAt: new Date().toISOString()
-    });
-    return response.data;
+      connections
+    );
+    
+    const response = await apiClient.put<ApiResponse<WorkflowBackend>>(
+      `/teams/${teamId}/workflow/${workflowId}`,
+      requestData
+    );
+    const backendWorkflow = response.data;
+    
+    return convertBackendToFrontend(backendWorkflow);
   }
 
-  // Activate/Deactivate workflow
-  static async toggleWorkflowStatus(id: string, isActive: boolean): Promise<Workflow> {
-    const response = await apiClient.put<ApiResponse<Workflow>>(`/workflows/${id}/status`, {
-      isActive
-    });
-    return response.data;
+  // Activate/Deactivate workflow (if backend supports this)
+  static async toggleWorkflowStatus(
+    workflowId: string, 
+    isActive: boolean,
+    teamId: number = 1
+  ): Promise<Workflow> {
+    const response = await apiClient.put<ApiResponse<WorkflowBackend>>(
+      `/teams/${teamId}/workflow/${workflowId}/status`, 
+      { isActive }
+    );
+    const backendWorkflow = response.data;
+    
+    return convertBackendToFrontend(backendWorkflow);
   }
 
-  // Test webhook endpoint
+  // Test webhook endpoint (if backend supports this)
   static async testWebhook(webhookUrl: string, payload: Record<string, unknown>): Promise<{
     success: boolean;
     response?: unknown;
@@ -100,38 +142,9 @@ export class WorkflowService {
       success: boolean;
       response?: unknown;
       error?: string;
-    }>>('/webhooks/test', {
+    }>>('/webhook/test', {
       url: webhookUrl,
       payload
-    });
-    return response.data;
-  }
-
-  // Get workflow templates
-  static async getTemplates(): Promise<Array<{
-    id: string;
-    name: string;
-    description: string;
-    category: string;
-    nodes: WorkflowNode[];
-    connections: Connection[];
-  }>> {
-    const response = await apiClient.get<ApiResponse<Array<{
-      id: string;
-      name: string;
-      description: string;
-      category: string;
-      nodes: WorkflowNode[];
-      connections: Connection[];
-    }>>>('/workflows/templates');
-    return response.data;
-  }
-
-  // Create workflow from template
-  static async createFromTemplate(templateId: string, name: string): Promise<Workflow> {
-    const response = await apiClient.post<ApiResponse<Workflow>>('/workflows/from-template', {
-      templateId,
-      name
     });
     return response.data;
   }

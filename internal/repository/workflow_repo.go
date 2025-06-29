@@ -1,6 +1,9 @@
 package repository
 
 import (
+	"errors"
+	"fmt"
+
 	"github.com/danielmoisa/workflow-builder/internal/model"
 	"go.uber.org/zap"
 	"gorm.io/gorm"
@@ -40,11 +43,14 @@ func (impl *WorkflowRepository) UpdateWholeFlowAction(action *model.Workflow) er
 }
 
 func (impl *WorkflowRepository) RetrieveWorkflowByTeamIDAndID(teamID int, workflowID int) (*model.Workflow, error) {
-	var action *model.Workflow
-	if err := impl.db.Where("team_id = ? AND id = ?", teamID, workflowID).Find(&action).Error; err != nil {
+	var workflow model.Workflow
+	if err := impl.db.Where("team_id = ? AND id = ?", teamID, workflowID).First(&workflow).Error; err != nil {
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			return nil, fmt.Errorf("workflow not found for teamID %d and workflowID %d", teamID, workflowID)
+		}
 		return nil, err
 	}
-	return action, nil
+	return &workflow, nil
 }
 
 func (impl *WorkflowRepository) RetrieveAll(teamID int, workflowID int, version int) ([]*model.Workflow, error) {

@@ -22,6 +22,7 @@ type GetWorkflowResponse struct {
 	Content           map[string]interface{} `json:"content"`
 	Transformer       map[string]interface{} `json:"transformer"`
 	TriggerMode       string                 `json:"triggerMode"`
+	Template          map[string]interface{} `json:"template"`
 	Config            map[string]interface{} `json:"config"`
 	CreatedAt         time.Time              `json:"createdAt,omitempty"`
 	CreatedBy         string                 `json:"createdBy,omitempty"`

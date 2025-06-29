@@ -11,23 +11,25 @@ export function useWorkflow(workflowId?: string) {
   const [error, setError] = useState<string | null>(null);
 
   // Load workflow data
-  const loadWorkflow = async (id: string) => {
+  const loadWorkflow = async (id: string, teamId: number) => {
     setLoading(true);
     setError(null);
     try {
-      const workflowData = await WorkflowService.getWorkflow(id);
+      const workflowData = await WorkflowService.getWorkflow(id, teamId);
       setWorkflow(workflowData);
-      setNodes(workflowData.nodes);
-      setConnections(workflowData.connections);
+      setNodes(workflowData.nodes || []);
+      setConnections(workflowData.connections || []);
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Failed to load workflow');
+      setNodes([]);
+      setConnections([]);
     } finally {
       setLoading(false);
     }
   };
 
   // Save workflow changes
-  const saveWorkflow = async () => {
+  const saveWorkflow = async (teamId: number = 1) => {
     if (!workflow) return;
     
     setLoading(true);
@@ -36,7 +38,8 @@ export function useWorkflow(workflowId?: string) {
       const updatedWorkflow = await WorkflowService.saveWorkflow(
         workflow.id,
         nodes,
-        connections
+        connections,
+        teamId
       );
       setWorkflow(updatedWorkflow);
     } catch (err) {
@@ -47,7 +50,7 @@ export function useWorkflow(workflowId?: string) {
   };
 
   // Create new workflow
-  const createWorkflow = async (name: string, description?: string) => {
+  const createWorkflow = async (name: string, description?: string, teamId: number = 1) => {
     setLoading(true);
     setError(null);
     try {
@@ -56,7 +59,7 @@ export function useWorkflow(workflowId?: string) {
         description,
         nodes: [],
         connections: []
-      });
+      }, teamId);
       setWorkflow(newWorkflow);
       setNodes([]);
       setConnections([]);
@@ -70,13 +73,13 @@ export function useWorkflow(workflowId?: string) {
   };
 
   // Execute workflow
-  const executeWorkflow = async (input?: Record<string, unknown>) => {
+  const executeWorkflow = async (input?: Record<string, unknown>, teamId: number = 1) => {
     if (!workflow) return;
     
     setLoading(true);
     setError(null);
     try {
-      const result = await WorkflowService.executeWorkflow(workflow.id, input);
+      const result = await WorkflowService.executeWorkflow(workflow.id, input, teamId);
       return result;
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Failed to execute workflow');
@@ -87,7 +90,7 @@ export function useWorkflow(workflowId?: string) {
   };
 
   // Toggle workflow active status
-  const toggleActive = async () => {
+  const toggleActive = async (teamId: number = 1) => {
     if (!workflow) return;
     
     setLoading(true);
@@ -95,7 +98,8 @@ export function useWorkflow(workflowId?: string) {
     try {
       const updatedWorkflow = await WorkflowService.toggleWorkflowStatus(
         workflow.id,
-        !workflow.isActive
+        !workflow.isActive,
+        teamId
       );
       setWorkflow(updatedWorkflow);
     } catch (err) {
@@ -134,11 +138,11 @@ export function useWorkflowList() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  const loadWorkflows = async () => {
+  const loadWorkflows = async (teamId: number = 1) => {
     setLoading(true);
     setError(null);
     try {
-      const workflowList = await WorkflowService.getWorkflows();
+      const workflowList = await WorkflowService.getWorkflows(teamId);
       setWorkflows(workflowList);
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Failed to load workflows');
@@ -147,11 +151,11 @@ export function useWorkflowList() {
     }
   };
 
-  const deleteWorkflow = async (id: string) => {
+  const deleteWorkflow = async (id: string, teamId: number = 1) => {
     setLoading(true);
     setError(null);
     try {
-      await WorkflowService.deleteWorkflow(id);
+      await WorkflowService.deleteWorkflow(id, teamId);
       setWorkflows(prev => prev.filter(w => w.id !== id));
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Failed to delete workflow');

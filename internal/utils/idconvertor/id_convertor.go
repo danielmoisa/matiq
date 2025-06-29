@@ -2,6 +2,7 @@ package idconvertor
 
 import (
 	"math"
+	"strconv"
 
 	"github.com/danielmoisa/workflow-builder/internal/config"
 )
@@ -27,7 +28,31 @@ func init() {
 	}
 }
 
+// func ConvertStringToInt(bv string) int {
+// 	var r int
+// 	arr := []rune(bv)
+// 	arrLen := len(arr)
+
+// 	for i := 0; i < 6; i++ {
+// 		si := s[i]
+// 		if si >= arrLen {
+// 			return 0
+// 		}
+// 		r += tr[string(arr[s[i]])] * int(math.Pow(float64(58), float64(i)))
+// 	}
+// 	return (r - add) ^ xor
+// }
+
 func ConvertStringToInt(bv string) int {
+	// Handle simple numeric strings
+	if len(bv) < 12 {
+		if intVal, err := strconv.Atoi(bv); err == nil {
+			return intVal
+		}
+		return 0
+	}
+
+	// Handle encoded strings (original logic)
 	var r int
 	arr := []rune(bv)
 	arrLen := len(arr)
