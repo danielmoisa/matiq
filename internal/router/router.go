@@ -26,11 +26,6 @@ func (r *Router) RegisterRouters(engine *gin.Engine) {
 	workflowRouter := routerGroup.Group("/teams/:teamID/workflow")
 	authRouter := routerGroup.Group("/auth")
 
-	// Authentication Flow:
-	// 1. Public endpoints: login, register, refresh, logout, validate
-	// 2. Protected endpoints: require valid JWT token via AuthMiddleware
-	// 3. Role-based endpoints: require specific roles via RequireRole middleware
-
 	// health router
 	healthRouter.GET("", r.Controller.GetHealth)
 

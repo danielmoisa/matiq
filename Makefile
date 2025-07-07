@@ -22,6 +22,10 @@ build-http-server-internal:
 docker-compose:
 	docker-compose up -d
 
+swagger:
+	swag init --parseDependency --parseInternal -g ./cmd/workflow-builder-backend/main.go -o docs
+
+
 test:
 	PROJECT_PWD=$(shell pwd) go test -race ./...
 

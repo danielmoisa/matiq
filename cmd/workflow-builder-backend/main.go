@@ -1,9 +1,10 @@
 package main
 
 import (
-	"fmt"
 	"os"
 
+	"github.com/danielmoisa/workflow-builder/docs"
+	_ "github.com/danielmoisa/workflow-builder/docs"
 	"github.com/danielmoisa/workflow-builder/internal/config"
 	"github.com/danielmoisa/workflow-builder/internal/controller"
 	"github.com/danielmoisa/workflow-builder/internal/driver/keycloak"
@@ -16,6 +17,8 @@ import (
 	"github.com/danielmoisa/workflow-builder/internal/utils/logger"
 	"github.com/danielmoisa/workflow-builder/internal/utils/recovery"
 	"github.com/gin-gonic/gin"
+	swaggerfiles "github.com/swaggo/files"
+	ginSwagger "github.com/swaggo/gin-swagger"
 
 	"go.uber.org/zap"
 )
@@ -87,17 +90,6 @@ func initServer() (*Server, error) {
 	cache := initCache(globalConfig, sugaredLogger)
 	keycloakClient := initKeycloak(globalConfig, sugaredLogger)
 
-	// Check for nil dependencies
-	if repository == nil {
-		return nil, fmt.Errorf("failed to initialize repository")
-	}
-	if cache == nil {
-		return nil, fmt.Errorf("failed to initialize cache")
-	}
-	if keycloakClient == nil {
-		return nil, fmt.Errorf("failed to initialize keycloak client")
-	}
-
 	// drive := initDrive(globalConfig, sugaredLogger)
 
 	// init attribute group
@@ -123,6 +115,11 @@ func (server *Server) Start() {
 	// init cors
 	server.engine.Use(gin.CustomRecovery(recovery.CorsHandleRecovery))
 	server.engine.Use(cors.Cors())
+
+	// init swagger
+	docs.SwaggerInfo.Host = server.config.ServerHost + ":" + server.config.ServerPort
+	server.engine.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerfiles.Handler))
+
 	server.router.RegisterRouters(server.engine)
 
 	// run
@@ -133,6 +130,22 @@ func (server *Server) Start() {
 	}
 }
 
+// @title			Go Flow Automation API
+// @version		1.0
+// @description	A auth and authorization application built with Go
+// @termsOfService	http://swagger.io/terms/
+// @contact.name	API Support
+// @contact.url	http://www.swagger.io/support
+// @contact.email	support@swagger.io
+// @license.name	MIT
+// @license.url	https://opensource.org/licenses/MIT
+// @host			localhost:8001
+// @BasePath		/api/v1
+// @schemes		http https
+// @securityDefinitions.apikey BearerAuth
+// @in header
+// @name Authorization
+// @description Type "Bearer" followed by a space and JWT token.
 func main() {
 	server, err := initServer()
 
