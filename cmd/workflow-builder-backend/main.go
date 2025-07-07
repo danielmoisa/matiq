@@ -1,10 +1,12 @@
 package main
 
 import (
+	"fmt"
 	"os"
 
 	"github.com/danielmoisa/workflow-builder/internal/config"
 	"github.com/danielmoisa/workflow-builder/internal/controller"
+	"github.com/danielmoisa/workflow-builder/internal/driver/keycloak"
 	"github.com/danielmoisa/workflow-builder/internal/driver/postgres"
 	"github.com/danielmoisa/workflow-builder/internal/driver/redis"
 	"github.com/danielmoisa/workflow-builder/internal/repository"
@@ -37,7 +39,8 @@ func NewServer(config *config.Config, engine *gin.Engine, router *router.Router,
 func initRepo(globalConfig *config.Config, logger *zap.SugaredLogger) *repository.Repository {
 	postgresDriver, err := postgres.NewPostgresConnectionByGlobalConfig(globalConfig, logger)
 	if err != nil {
-		logger.Errorw("Error in startup, repository init failed.")
+		logger.Errorw("Error in startup, repository init failed.", "error", err)
+		return nil
 	}
 	return repository.NewRepository(postgresDriver, logger)
 }
@@ -45,7 +48,8 @@ func initRepo(globalConfig *config.Config, logger *zap.SugaredLogger) *repositor
 func initCache(globalConfig *config.Config, logger *zap.SugaredLogger) *cache.Cache {
 	redisDriver, err := redis.NewRedisConnectionByGlobalConfig(globalConfig, logger)
 	if err != nil {
-		logger.Errorw("Error in startup, cache init failed.")
+		logger.Errorw("Error in startup, cache init failed.", "error", err)
+		return nil
 	}
 	return cache.NewCache(redisDriver, logger)
 }
@@ -61,6 +65,15 @@ func initCache(globalConfig *config.Config, logger *zap.SugaredLogger) *cache.Ca
 // 	return nil
 // }
 
+func initKeycloak(globalConfig *config.Config, logger *zap.SugaredLogger) *keycloak.Client {
+	keycloakClient, err := keycloak.NewClientFromConfig(globalConfig)
+	if err != nil {
+		logger.Errorw("Error in startup, keycloak init failed.", "error", err)
+		return nil
+	}
+	return keycloakClient
+}
+
 func initServer() (*Server, error) {
 	globalConfig := config.GetInstance()
 	engine := gin.New()
@@ -72,6 +85,19 @@ func initServer() (*Server, error) {
 	// init driver
 	repository := initRepo(globalConfig, sugaredLogger)
 	cache := initCache(globalConfig, sugaredLogger)
+	keycloakClient := initKeycloak(globalConfig, sugaredLogger)
+
+	// Check for nil dependencies
+	if repository == nil {
+		return nil, fmt.Errorf("failed to initialize repository")
+	}
+	if cache == nil {
+		return nil, fmt.Errorf("failed to initialize cache")
+	}
+	if keycloakClient == nil {
+		return nil, fmt.Errorf("failed to initialize keycloak client")
+	}
+
 	// drive := initDrive(globalConfig, sugaredLogger)
 
 	// init attribute group
@@ -81,7 +107,7 @@ func initServer() (*Server, error) {
 	// }
 
 	// init controller
-	c := controller.NewControllerForBackend(repository, cache)
+	c := controller.NewControllerForBackend(repository, cache, keycloakClient)
 	router := router.NewRouter(c)
 	server := NewServer(globalConfig, engine, router, sugaredLogger)
 	return server, nil
@@ -111,7 +137,8 @@ func main() {
 	server, err := initServer()
 
 	if err != nil {
-
+		logger.NewSugardLogger().Errorw("Failed to initialize server", "error", err)
+		os.Exit(1)
 	}
 
 	server.Start()

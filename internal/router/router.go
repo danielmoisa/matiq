@@ -24,17 +24,41 @@ func (r *Router) RegisterRouters(engine *gin.Engine) {
 
 	healthRouter := routerGroup.Group("/health")
 	workflowRouter := routerGroup.Group("/teams/:teamID/workflow")
+	authRouter := routerGroup.Group("/auth")
 
-	// flowActionRouter.Use(remotejwtauth.RemoteJWTAuth())
+	// Authentication Flow:
+	// 1. Public endpoints: login, register, refresh, logout, validate
+	// 2. Protected endpoints: require valid JWT token via AuthMiddleware
+	// 3. Role-based endpoints: require specific roles via RequireRole middleware
 
 	// health router
 	healthRouter.GET("", r.Controller.GetHealth)
 
-	// flow action routers
+	// auth action routers (public endpoints)
+	authRouter.POST("/login", r.Controller.Login)
+	authRouter.POST("/register", r.Controller.Register)
+	authRouter.POST("/refresh", r.Controller.RefreshToken)
+	authRouter.POST("/logout", r.Controller.Logout)
+	authRouter.GET("/validate", r.Controller.ValidateToken)
+
+	// protected auth endpoints (require authentication)
+	protectedAuthRouter := authRouter.Group("")
+	protectedAuthRouter.Use(r.Controller.AuthMiddleware())
+	protectedAuthRouter.GET("/profile", r.Controller.GetProfile)
+
+	// protected workflow routers (require authentication)
+	workflowRouter.Use(r.Controller.AuthMiddleware())
 	workflowRouter.POST("", r.Controller.CreateWorkflow)
 	workflowRouter.GET("/:workflowID", r.Controller.GetWorkflow)
-	// flowActionRouter.PUT("/:flowActionID", r.Controller.UpdateFlowAction)
-	// flowActionRouter.DELETE("/:flowActionID", r.Controller.DeleteFlowAction)
-	// flowActionRouter.POST("/:flowActionID/run", r.Controller.RunFlowAction)
-	// flowActionRouter.PUT("/byBatch", r.Controller.UpdateFlowActionByBatch)
+
+	// admin-only workflow routes (require admin role)
+	adminWorkflowRouter := workflowRouter.Group("")
+	adminWorkflowRouter.Use(r.Controller.RequireRole("admin"))
+	// adminWorkflowRouter.DELETE("/:workflowID", r.Controller.DeleteWorkflow)
+	// adminWorkflowRouter.PUT("/:workflowID/admin", r.Controller.AdminUpdateWorkflow)
+
+	// TODO: Add more workflow endpoints as needed
+	// workflowRouter.PUT("/:workflowID", r.Controller.UpdateWorkflow)
+	// workflowRouter.DELETE("/:workflowID", r.Controller.DeleteWorkflow)
+	// workflowRouter.POST("/:workflowID/run", r.Controller.RunWorkflow)
 }

@@ -100,6 +100,14 @@ type Config struct {
 	IPZoneDetectorToken string `env:"WF_IP_ZONE_DETECTOR_TOKEN" envDefault:""`
 	// drive config
 	DriveRestAPI string `env:"WF_DRIVE_API" envDefault:"http://workflow-builder-drive-backend:8004"`
+
+	// Keycloak config
+	KeycloakURL          string `env:"WF_KEYCLOAK_URL" envDefault:"http://localhost:8888"`
+	KeycloakRealm        string `env:"WF_KEYCLOAK_REALM" envDefault:"admin"`
+	KeycloakClientID     string `env:"WF_KEYCLOAK_CLIENT_ID" envDefault:"workflow"`
+	KeycloakClientSecret string `env:"WF_KEYCLOAK_CLIENT_SECRET" envDefault:""`
+	KeycloakAdminUser    string `env:"WF_KEYCLOAK_ADMIN_USER" envDefault:"admin"`
+	KeycloakAdminPass    string `env:"WF_KEYCLOAK_ADMIN_PASS" envDefault:"admin123"`
 }
 
 func getConfig() (*Config, error) {
@@ -333,4 +341,51 @@ func (c *Config) GetWebScoketServerConnectionAddressCenterEurope() string {
 
 func (c *Config) GetDriveAPIForSDK() string {
 	return c.DriveRestAPI
+}
+
+// GetKeycloakConfig creates a Keycloak config from the main configuration
+func (c *Config) GetKeycloakConfig() *KeycloakConfig {
+	return &KeycloakConfig{
+		URL:          c.KeycloakURL,
+		Realm:        c.KeycloakRealm,
+		ClientID:     c.KeycloakClientID,
+		ClientSecret: c.KeycloakClientSecret,
+		AdminUser:    c.KeycloakAdminUser,
+		AdminPass:    c.KeycloakAdminPass,
+	}
+}
+
+// KeycloakConfig represents Keycloak configuration
+type KeycloakConfig struct {
+	URL          string
+	Realm        string
+	ClientID     string
+	ClientSecret string
+	AdminUser    string
+	AdminPass    string
+}
+
+// Validate checks if Keycloak configuration is valid
+func (kc *KeycloakConfig) Validate() error {
+	if kc.URL == "" {
+		return fmt.Errorf("keycloak URL is required")
+	}
+	if kc.Realm == "" {
+		return fmt.Errorf("keycloak realm is required")
+	}
+	if kc.ClientID == "" {
+		return fmt.Errorf("keycloak client ID is required")
+	}
+	if kc.AdminUser == "" {
+		return fmt.Errorf("keycloak admin user is required")
+	}
+	if kc.AdminPass == "" {
+		return fmt.Errorf("keycloak admin password is required")
+	}
+	return nil
+}
+
+// IsEnabled checks if Keycloak is enabled (has basic required config)
+func (c *Config) IsKeycloakEnabled() bool {
+	return c.KeycloakURL != "" && c.KeycloakRealm != "" && c.KeycloakClientID != ""
 }
