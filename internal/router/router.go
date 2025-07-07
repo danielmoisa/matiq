@@ -46,14 +46,4 @@ func (r *Router) RegisterRouters(engine *gin.Engine) {
 	workflowRouter.POST("", r.Controller.CreateWorkflow)
 	workflowRouter.GET("/:workflowID", r.Controller.GetWorkflow)
 
-	// admin-only workflow routes (require admin role)
-	adminWorkflowRouter := workflowRouter.Group("")
-	adminWorkflowRouter.Use(r.Controller.RequireRole("admin"))
-	// adminWorkflowRouter.DELETE("/:workflowID", r.Controller.DeleteWorkflow)
-	// adminWorkflowRouter.PUT("/:workflowID/admin", r.Controller.AdminUpdateWorkflow)
-
-	// TODO: Add more workflow endpoints as needed
-	// workflowRouter.PUT("/:workflowID", r.Controller.UpdateWorkflow)
-	// workflowRouter.DELETE("/:workflowID", r.Controller.DeleteWorkflow)
-	// workflowRouter.POST("/:workflowID/run", r.Controller.RunWorkflow)
 }

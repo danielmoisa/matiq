@@ -43,6 +43,8 @@ type TokenInfo struct {
 	Valid    bool                   `json:"valid"`
 	UserID   string                 `json:"user_id"`
 	Username string                 `json:"username"`
+	Email    string                 `json:"email"`
+	Enabled  bool                   `json:"enabled"`
 	Roles    []string               `json:"roles"`
 	Claims   map[string]interface{} `json:"claims"`
 }
@@ -113,23 +115,73 @@ func (c *Client) AuthenticateUser(ctx context.Context, username, password string
 
 // ValidateToken validates a JWT token and returns token info
 func (c *Client) ValidateToken(ctx context.Context, token string) (*TokenInfo, error) {
+	// First, introspect the token to check if it's active
 	result, err := c.client.RetrospectToken(ctx, token, c.config.ClientID, c.config.ClientSecret, c.config.Realm)
 	if err != nil {
-		return nil, fmt.Errorf("token introspection failed: %w", err)
+		return &TokenInfo{Valid: false}, fmt.Errorf("token introspection failed: %w", err)
 	}
 
 	if !*result.Active {
 		return &TokenInfo{Valid: false}, nil
 	}
 
-	// Basic token info from introspection
-	// For detailed user info including roles, use GetUserInfo method separately
+	// Get user info using the userinfo endpoint (this requires the access token)
+	userInfo, err := c.client.GetUserInfo(ctx, token, c.config.Realm)
+	if err != nil {
+		log.Printf("Warning: failed to get user info from userinfo endpoint: %v", err)
+		// Return basic validation without user details
+		return &TokenInfo{
+			Valid:    true,
+			UserID:   "",
+			Username: "",
+			Email:    "",
+			Enabled:  true,
+			Roles:    []string{},
+			Claims:   make(map[string]interface{}),
+		}, nil
+	}
+
+	// Extract user information from userinfo response
+	userID := getStringFromPointer(userInfo.Sub)
+	username := getStringFromPointer(userInfo.PreferredUsername)
+	if username == "" {
+		username = getStringFromPointer(userInfo.Name)
+	}
+	email := getStringFromPointer(userInfo.Email)
+
+	// Check if user is enabled (default to true if not specified)
+	enabled := true
+	if userInfo.EmailVerified != nil {
+		enabled = *userInfo.EmailVerified
+	}
+
+	// Get user roles from Keycloak admin API using the user ID
+	var roles []string
+	if userID != "" {
+		if err := c.ensureAdminToken(ctx); err == nil {
+			userRoles, roleErr := c.client.GetRealmRolesByUserID(ctx, c.adminToken.AccessToken, c.config.Realm, userID)
+			if roleErr == nil {
+				for _, role := range userRoles {
+					if role.Name != nil {
+						roles = append(roles, *role.Name)
+					}
+				}
+			} else {
+				log.Printf("Warning: failed to get user roles: %v", roleErr)
+			}
+		} else {
+			log.Printf("Warning: failed to ensure admin token: %v", err)
+		}
+	}
+
 	return &TokenInfo{
 		Valid:    true,
-		UserID:   "", // Will be populated by separate call if needed
-		Username: "", // Will be populated by separate call if needed
-		Roles:    []string{},
-		Claims:   make(map[string]interface{}),
+		UserID:   userID,
+		Username: username,
+		Email:    email,
+		Enabled:  enabled,
+		Roles:    roles,
+		Claims:   convertUserInfoToMap(userInfo),
 	}, nil
 }
 
@@ -329,4 +381,41 @@ func getBoolPtr(ptr *bool) bool {
 		return false
 	}
 	return *ptr
+}
+
+// Helper function to safely extract string from pointer
+func getStringFromPointer(ptr *string) string {
+	if ptr == nil {
+		return ""
+	}
+	return *ptr
+}
+
+// Helper function to convert UserInfo to map
+func convertUserInfoToMap(userInfo *gocloak.UserInfo) map[string]interface{} {
+	claims := make(map[string]interface{})
+
+	if userInfo.Sub != nil {
+		claims["sub"] = *userInfo.Sub
+	}
+	if userInfo.PreferredUsername != nil {
+		claims["preferred_username"] = *userInfo.PreferredUsername
+	}
+	if userInfo.Email != nil {
+		claims["email"] = *userInfo.Email
+	}
+	if userInfo.EmailVerified != nil {
+		claims["email_verified"] = *userInfo.EmailVerified
+	}
+	if userInfo.Name != nil {
+		claims["name"] = *userInfo.Name
+	}
+	if userInfo.GivenName != nil {
+		claims["given_name"] = *userInfo.GivenName
+	}
+	if userInfo.FamilyName != nil {
+		claims["family_name"] = *userInfo.FamilyName
+	}
+
+	return claims
 }

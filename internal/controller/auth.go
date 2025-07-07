@@ -109,18 +109,7 @@ func (controller *Controller) Login(c *gin.Context) {
 		return
 	}
 
-	// Get detailed user information
-	userInfo, err := controller.KeycloakClient.GetUserInfo(c.Request.Context(), tokenInfo.UserID)
-	if err != nil {
-		// Log error but continue with basic user info
-		fmt.Printf("Warning: Could not fetch detailed user info: %v\n", err)
-		userInfo = &keycloak.UserInfo{
-			ID:       tokenInfo.UserID,
-			Username: tokenInfo.Username,
-			Roles:    tokenInfo.Roles,
-		}
-	}
-
+	// TokenInfo now includes all necessary user information, no need for additional GetUserInfo call
 	expiresAt := time.Now().Add(time.Duration(token.ExpiresIn) * time.Second)
 
 	c.JSON(http.StatusOK, LoginResponse{
@@ -128,11 +117,11 @@ func (controller *Controller) Login(c *gin.Context) {
 		Message: "Login successful",
 		Data: &AuthenticationData{
 			User: &UserInfo{
-				ID:       userInfo.ID,
-				Username: userInfo.Username,
-				Email:    userInfo.Email,
-				Enabled:  userInfo.Enabled,
-				Roles:    userInfo.Roles,
+				ID:       tokenInfo.UserID,
+				Username: tokenInfo.Username,
+				Email:    tokenInfo.Email,
+				Enabled:  tokenInfo.Enabled,
+				Roles:    tokenInfo.Roles,
 			},
 			AccessToken:  token.AccessToken,
 			RefreshToken: token.RefreshToken,
@@ -260,16 +249,7 @@ func (controller *Controller) RefreshToken(c *gin.Context) {
 		return
 	}
 
-	// Get user details
-	userInfo, err := controller.KeycloakClient.GetUserInfo(c.Request.Context(), tokenInfo.UserID)
-	if err != nil {
-		userInfo = &keycloak.UserInfo{
-			ID:       tokenInfo.UserID,
-			Username: tokenInfo.Username,
-			Roles:    tokenInfo.Roles,
-		}
-	}
-
+	// TokenInfo now includes all necessary user information
 	expiresAt := time.Now().Add(time.Duration(token.ExpiresIn) * time.Second)
 
 	c.JSON(http.StatusOK, LoginResponse{
@@ -277,11 +257,11 @@ func (controller *Controller) RefreshToken(c *gin.Context) {
 		Message: "Token refreshed successfully",
 		Data: &AuthenticationData{
 			User: &UserInfo{
-				ID:       userInfo.ID,
-				Username: userInfo.Username,
-				Email:    userInfo.Email,
-				Enabled:  userInfo.Enabled,
-				Roles:    userInfo.Roles,
+				ID:       tokenInfo.UserID,
+				Username: tokenInfo.Username,
+				Email:    tokenInfo.Email,
+				Enabled:  tokenInfo.Enabled,
+				Roles:    tokenInfo.Roles,
 			},
 			AccessToken:  token.AccessToken,
 			RefreshToken: token.RefreshToken,
@@ -388,7 +368,24 @@ func (controller *Controller) ValidateToken(c *gin.Context) {
 // @Failure 401 {object} ErrorResponse
 // @Router /auth/profile [get]
 func (controller *Controller) GetProfile(c *gin.Context) {
-	// Get user info from token
+	// Try to get token info from context first (set by auth middleware)
+	if tokenInfo, exists := c.Get("token_info"); exists {
+		tokenInfoStruct := tokenInfo.(*keycloak.TokenInfo)
+		c.JSON(http.StatusOK, ProfileResponse{
+			Success: true,
+			Message: "Profile retrieved successfully",
+			Data: &UserInfo{
+				ID:       tokenInfoStruct.UserID,
+				Username: tokenInfoStruct.Username,
+				Email:    tokenInfoStruct.Email,
+				Enabled:  tokenInfoStruct.Enabled,
+				Roles:    tokenInfoStruct.Roles,
+			},
+		})
+		return
+	}
+
+	// Fallback: get user info from token directly
 	userID, exists := c.Get("user_id")
 	if !exists {
 		c.JSON(http.StatusUnauthorized, ErrorResponse{
@@ -398,7 +395,7 @@ func (controller *Controller) GetProfile(c *gin.Context) {
 		return
 	}
 
-	// Get detailed user information
+	// Get detailed user information (only if token info not available in context)
 	userInfo, err := controller.KeycloakClient.GetUserInfo(c.Request.Context(), userID.(string))
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, ErrorResponse{
@@ -448,7 +445,10 @@ func (controller *Controller) AuthMiddleware() gin.HandlerFunc {
 		// Set user context
 		c.Set("user_id", tokenInfo.UserID)
 		c.Set("username", tokenInfo.Username)
+		c.Set("user_email", tokenInfo.Email)
+		c.Set("user_enabled", tokenInfo.Enabled)
 		c.Set("user_roles", tokenInfo.Roles)
+		c.Set("token_info", tokenInfo) // Store complete token info for efficiency
 
 		c.Next()
 	}
@@ -531,19 +531,49 @@ func (controller *Controller) GetUsernameFromKeycloakAuth(c *gin.Context) (strin
 	return usernameStr, nil
 }
 
-// GetUserRolesFromKeycloakAuth gets the user roles from Keycloak authentication context
-func (controller *Controller) GetUserRolesFromKeycloakAuth(c *gin.Context) ([]string, error) {
-	roles, exists := c.Get("user_roles")
+// GetUserEmailFromKeycloakAuth gets the user email from Keycloak authentication context
+func (controller *Controller) GetUserEmailFromKeycloakAuth(c *gin.Context) (string, error) {
+	email, exists := c.Get("user_email")
 	if !exists {
-		controller.FeedbackBadRequest(c, ERROR_FLAG_VALIDATE_REQUEST_TOKEN_FAILED, "auth token invalid, can not fetch user roles in it.")
-		return nil, fmt.Errorf("input missing user_roles field")
+		controller.FeedbackBadRequest(c, ERROR_FLAG_VALIDATE_REQUEST_TOKEN_FAILED, "auth token invalid, can not fetch user email in it.")
+		return "", fmt.Errorf("input missing user_email field")
 	}
-	rolesSlice, ok := roles.([]string)
+	emailStr, ok := email.(string)
 	if !ok {
-		controller.FeedbackBadRequest(c, ERROR_FLAG_VALIDATE_REQUEST_TOKEN_FAILED, "auth token invalid, user roles is not []string type in it.")
-		return nil, fmt.Errorf("input user_roles in wrong format")
+		controller.FeedbackBadRequest(c, ERROR_FLAG_VALIDATE_REQUEST_TOKEN_FAILED, "auth token invalid, user email is not string type in it.")
+		return "", fmt.Errorf("input user_email in wrong format")
 	}
-	return rolesSlice, nil
+	return emailStr, nil
+}
+
+// GetUserEnabledFromKeycloakAuth gets the user enabled status from Keycloak authentication context
+func (controller *Controller) GetUserEnabledFromKeycloakAuth(c *gin.Context) (bool, error) {
+	enabled, exists := c.Get("user_enabled")
+	if !exists {
+		controller.FeedbackBadRequest(c, ERROR_FLAG_VALIDATE_REQUEST_TOKEN_FAILED, "auth token invalid, can not fetch user enabled status in it.")
+		return false, fmt.Errorf("input missing user_enabled field")
+	}
+	enabledBool, ok := enabled.(bool)
+	if !ok {
+		controller.FeedbackBadRequest(c, ERROR_FLAG_VALIDATE_REQUEST_TOKEN_FAILED, "auth token invalid, user enabled is not bool type in it.")
+		return false, fmt.Errorf("input user_enabled in wrong format")
+	}
+	return enabledBool, nil
+}
+
+// GetTokenInfoFromKeycloakAuth gets the complete token info from Keycloak authentication context
+func (controller *Controller) GetTokenInfoFromKeycloakAuth(c *gin.Context) (*keycloak.TokenInfo, error) {
+	tokenInfo, exists := c.Get("token_info")
+	if !exists {
+		controller.FeedbackBadRequest(c, ERROR_FLAG_VALIDATE_REQUEST_TOKEN_FAILED, "auth token invalid, can not fetch token info in it.")
+		return nil, fmt.Errorf("input missing token_info field")
+	}
+	tokenInfoStruct, ok := tokenInfo.(*keycloak.TokenInfo)
+	if !ok {
+		controller.FeedbackBadRequest(c, ERROR_FLAG_VALIDATE_REQUEST_TOKEN_FAILED, "auth token invalid, token info is not correct type in it.")
+		return nil, fmt.Errorf("input token_info in wrong format")
+	}
+	return tokenInfoStruct, nil
 }
 
 // ValidateKeycloakAuth validates the Keycloak token from the Authorization header
