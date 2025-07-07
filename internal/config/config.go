@@ -105,7 +105,7 @@ type Config struct {
 	KeycloakURL          string `env:"WF_KEYCLOAK_URL" envDefault:"http://localhost:8888"`
 	KeycloakRealm        string `env:"WF_KEYCLOAK_REALM" envDefault:"admin"`
 	KeycloakClientID     string `env:"WF_KEYCLOAK_CLIENT_ID" envDefault:"workflow"`
-	KeycloakClientSecret string `env:"WF_KEYCLOAK_CLIENT_SECRET" envDefault:""`
+	KeycloakClientSecret string `env:"WF_KEYCLOAK_CLIENT_SECRET" envDefault:"qUlGcweKQETa2dPTIn8dH2i6ISBg0KF8"`
 	KeycloakAdminUser    string `env:"WF_KEYCLOAK_ADMIN_USER" envDefault:"admin"`
 	KeycloakAdminPass    string `env:"WF_KEYCLOAK_ADMIN_PASS" envDefault:"admin123"`
 }
