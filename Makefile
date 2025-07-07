@@ -5,6 +5,9 @@ all: build
 run:
 	go run ./cmd/workflow-builder-backend/main.go
 
+run-web:
+	cd web && npm run dev
+
 build: build-http-server build-websocket-server build-http-server-internal
 
 build-http-server:
@@ -15,6 +18,9 @@ build-websocket-server:
 
 build-http-server-internal:
 	go build -o bin/workflow-builder-backend-internal src/cmd/workflow-builder-backend-internal/main.go
+	
+docker-compose:
+	docker-compose up -d
 
 test:
 	PROJECT_PWD=$(shell pwd) go test -race ./...
