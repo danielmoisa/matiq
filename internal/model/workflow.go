@@ -17,7 +17,7 @@ const (
 type Workflow struct {
 	ID          int                    `gorm:"column:id;type:uint;primary_key"`
 	UID         uuid.UUID              `gorm:"column:uid;type:uuid;not null"`
-	TeamID      int                    `gorm:"column:team_id;type:uint"`
+	TeamID      int                    `gorm:"column:team_id;type:uint"` // TODO: remove and replace with userID
 	WorkflowID  int                    `gorm:"column:workflow_id;type:bigint;not null"`
 	Version     int                    `gorm:"column:version;type:bigint;not null"`
 	ResourceID  int                    `gorm:"column:resource_id;type:bigint;not null"`
@@ -30,16 +30,16 @@ type Workflow struct {
 	Context     map[string]interface{} `gorm:"-" sql:"-"`
 	Config      string                 `gorm:"column:config;type:jsonb"`
 	CreatedAt   time.Time              `gorm:"column:created_at;type:timestamp;not null"`
-	CreatedBy   int                    `gorm:"column:created_by;type:bigint;not null"`
+	CreatedBy   string                 `gorm:"column:created_by;type:varchar;size:255;not null"` // TODO: Refactor to uuid
 	UpdatedAt   time.Time              `gorm:"column:updated_at;type:timestamp;not null"`
-	UpdatedBy   int                    `gorm:"column:updated_by;type:bigint;not null"`
+	UpdatedBy   string                 `gorm:"column:updated_by;type:varchar;size:255;not null"`
 }
 
 func NewWorkflow() *Workflow {
 	return &Workflow{}
 }
 
-func NewWorkflowByCreateRequest(teamID int, workflowID int, userID int, req *request.CreateWorkflowRequest) (*Workflow, error) {
+func NewWorkflowByCreateRequest(teamID int, workflowID int, userID string, req *request.CreateWorkflowRequest) (*Workflow, error) {
 	action := &Workflow{
 		TeamID:     teamID,
 		WorkflowID: workflowID,
@@ -60,7 +60,7 @@ func NewWorkflowByCreateRequest(teamID int, workflowID int, userID int, req *req
 	return action, nil
 }
 
-func NewWorkflowByUpdateRequest(teamID int, workflowID int, userID int, req *request.UpdateWorkflowRequest) (*Workflow, error) {
+func NewWorkflowByUpdateRequest(teamID int, workflowID int, userID string, req *request.UpdateWorkflowRequest) (*Workflow, error) {
 	action := &Workflow{
 		TeamID:     teamID,
 		WorkflowID: workflowID,
@@ -81,7 +81,7 @@ func NewWorkflowByUpdateRequest(teamID int, workflowID int, userID int, req *req
 	return action, nil
 }
 
-func NewWorkflowByRunRequest(teamID int, workflowID int, userID int, req *request.RunWorkflowRequest) *Workflow {
+func NewWorkflowByRunRequest(teamID int, workflowID int, userID string, req *request.RunWorkflowRequest) *Workflow {
 	action := &Workflow{
 		TeamID:     teamID,
 		WorkflowID: workflowID,
@@ -116,7 +116,7 @@ func (action *Workflow) InitUpdatedAt() {
 	action.UpdatedAt = time.Now().UTC()
 }
 
-func (action *Workflow) InitForFork(teamID int, workflowID int, version int, userID int) {
+func (action *Workflow) InitForFork(teamID int, workflowID int, version int, userID string) {
 	action.TeamID = teamID
 	action.WorkflowID = workflowID
 	action.Version = version
@@ -193,7 +193,7 @@ func (action *Workflow) ExportIcon() string {
 // 	action.Template = string(templateJsonByte)
 // }
 
-// func (action *Workflow) UpdateAppConfig(actionConfig *FlowActionConfig, userID int) {
+// func (action *Workflow) UpdateAppConfig(actionConfig *FlowActionConfig, userID string) {
 // 	action.Config = actionConfig.ExportToJSONString()
 // 	action.UpdatedBy = userID
 // 	action.InitUpdatedAt()
@@ -206,7 +206,7 @@ func (action *Workflow) ExportIcon() string {
 // 	action.RawTemplate = string(templateJsonByte)
 // }
 
-// func (action *Workflow) UpdateWithRunFlowActionRequest(req *request.RunFlowActionRequest, userID int) {
+// func (action *Workflow) UpdateWithRunFlowActionRequest(req *request.RunFlowActionRequest, userID string) {
 // 	action.MergeRunFlowActionContextToRawTemplate(req.ExportContext())
 // 	action.Template = req.ExportTemplateInString()
 // 	action.UpdatedBy = userID
@@ -218,7 +218,7 @@ func (action *Workflow) ExportIcon() string {
 // 	}
 // }
 
-// func (action *Workflow) UpdateWorkflowByUpdateFlowActionRequest(teamID int, workflowID int, userID int, req *request.UpdateFlowActionRequest) {
+// func (action *Workflow) UpdateWorkflowByUpdateFlowActionRequest(teamID int, workflowID int, userID string, req *request.UpdateFlowActionRequest) {
 // 	action.TeamID = teamID
 // 	action.WorkflowID = workflowID
 // 	// action.Version = APP_EDIT_VERSION // new action always created in builder edit mode, and it is edit version.

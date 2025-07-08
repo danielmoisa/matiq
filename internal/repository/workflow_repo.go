@@ -129,3 +129,11 @@ func (impl *WorkflowRepository) DeleteAllFlowActionsByTeamIDWorkflowIDAndVersion
 	}
 	return nil
 }
+
+func (impl *WorkflowRepository) RetrieveAllWorkflowByUserID(userID string) ([]*model.Workflow, error) {
+	var workflows []*model.Workflow
+	if err := impl.db.Where("created_by = ?", userID).Find(&workflows).Error; err != nil {
+		return nil, err
+	}
+	return workflows, nil
+}

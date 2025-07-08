@@ -22,7 +22,7 @@ func (r *Router) RegisterRouters(engine *gin.Engine) {
 	// init route
 	routerGroup := engine.Group("/api/v1")
 	healthRouter := routerGroup.Group("/health")
-	workflowRouter := routerGroup.Group("/workflow")
+	workflowRouter := routerGroup.Group("/workflows")
 	authRouter := routerGroup.Group("/auth")
 
 	// health router
@@ -45,7 +45,8 @@ func (r *Router) RegisterRouters(engine *gin.Engine) {
 	// Workflow routes
 	// Protected -- requires Bearer token
 	workflowRouter.Use(r.Controller.AuthMiddleware())
-	workflowRouter.POST("", r.Controller.CreateWorkflow)
+	// workflowRouter.POST("", r.Controller.CreateWorkflow)
 	workflowRouter.GET("/:workflowID", r.Controller.GetWorkflow)
+	workflowRouter.GET("", r.Controller.GetWorkflows)
 
 }

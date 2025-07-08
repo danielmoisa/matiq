@@ -46,9 +46,9 @@ func NewCreateWorkflowResponse(workflow *model.Workflow) *CreateWorkflowResponse
 		TriggerMode: workflow.TriggerMode,
 		Config:      workflow.ExportConfigInMap(),
 		CreatedAt:   workflow.CreatedAt,
-		CreatedBy:   idconvertor.ConvertIntToString(workflow.CreatedBy),
+		CreatedBy:   workflow.CreatedBy,
 		UpdatedAt:   workflow.UpdatedAt,
-		UpdatedBy:   idconvertor.ConvertIntToString(workflow.UpdatedBy),
+		UpdatedBy:   workflow.UpdatedBy,
 	}
 	return resp
 }
