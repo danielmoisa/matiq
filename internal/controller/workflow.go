@@ -1,6 +1,7 @@
 package controller
 
 import (
+	"context"
 	"encoding/json"
 	"fmt"
 
@@ -221,32 +222,46 @@ func (controller *Controller) CreateWorkflow(c *gin.Context) {
 
 func (controller *Controller) GetWorkflow(c *gin.Context) {
 	// fetch needed param
-	teamID, errInGetTeamID := controller.GetMagicIntParamFromRequest(c, PARAM_TEAM_ID)
+	// teamID, errInGetTeamID := controller.GetMagicIntParamFromRequest(c, PARAM_TEAM_ID)
 	workflowID, errInGetAppID := controller.GetMagicIntParamFromRequest(c, PARAM_WORKFLOW_ID)
 	// userAuthToken, errInGetAuthToken := controller.GetUserAuthTokenFromHeader(c)
-	if errInGetTeamID != nil || errInGetAppID != nil {
+	if errInGetAppID != nil {
 		return
 	}
 
-	// validate
-	// canAccess, errInCheckAttr := controller.AttributeGroup.CanAccess(
-	// 	teamID,
-	// 	userAuthToken,
-	// 	accesscontrol.UNIT_TYPE_FLOW_ACTION,
-	// 	flowActionID,
-	// 	accesscontrol.ACTION_ACCESS_VIEW,
-	// )
-	// if errInCheckAttr != nil {
-	// 	controller.FeedbackBadRequest(c, ERROR_FLAG_ACCESS_DENIED, "error in check attribute: "+errInCheckAttr.Error())
-	// 	return
-	// }
-	// if !canAccess {
-	// 	controller.FeedbackBadRequest(c, ERROR_FLAG_ACCESS_DENIED, "you can not access this attribute due to access control policy.")
-	// 	return
-	// }
+	// Get user ID from Keycloak authentication
+	userID, errInGetUserID := controller.GetUserIDFromKeycloakAuth(c)
+	if errInGetUserID != nil {
+		controller.FeedbackBadRequest(c, ERROR_FLAG_ACCESS_DENIED, "authentication required")
+		return
+	}
+
+	// validate user permission using Keycloak groups
+	ctx := context.Background()
+
+	// Check if user is in workflow-viewers or workflow-managers group
+	canView, errInCheckViewer := controller.KeycloakClient.CheckUserInGroup(ctx, userID, "workflow-viewers")
+	if errInCheckViewer != nil {
+		controller.FeedbackBadRequest(c, ERROR_FLAG_ACCESS_DENIED, "error checking viewer permission: "+errInCheckViewer.Error())
+		return
+	}
+
+	if !canView {
+		// If not in viewers group, check if user is in managers group
+		canManage, errInCheckManager := controller.KeycloakClient.CheckUserInGroup(ctx, userID, "workflow-managers")
+		if errInCheckManager != nil {
+			controller.FeedbackBadRequest(c, ERROR_FLAG_ACCESS_DENIED, "error checking manager permission: "+errInCheckManager.Error())
+			return
+		}
+
+		if !canManage {
+			controller.FeedbackBadRequest(c, ERROR_FLAG_ACCESS_DENIED, "you do not have permission to view workflows")
+			return
+		}
+	}
 
 	// fetch data
-	workflow, errInGetAction := controller.Repository.WorkflowRepository.RetrieveWorkflowByTeamIDAndID(teamID, workflowID)
+	workflow, errInGetAction := controller.Repository.WorkflowRepository.RetrieveWorkflowByID(workflowID)
 	if errInGetAction != nil {
 		controller.FeedbackBadRequest(c, ERROR_FLAG_CAN_NOT_GET_WORKFLOW, "get workflow error: "+errInGetAction.Error())
 		return
@@ -272,7 +287,6 @@ func (controller *Controller) GetWorkflow(c *gin.Context) {
 
 	// feedback
 	controller.FeedbackOK(c, getActionResponse)
-	return
 }
 
 // func (controller *Controller) RunFlowAction(c *gin.Context) {

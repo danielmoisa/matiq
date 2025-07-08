@@ -22,7 +22,7 @@ func (r *Router) RegisterRouters(engine *gin.Engine) {
 	// init route
 	routerGroup := engine.Group("/api/v1")
 	healthRouter := routerGroup.Group("/health")
-	workflowRouter := routerGroup.Group("/teams/:teamID/workflow")
+	workflowRouter := routerGroup.Group("/workflow")
 	authRouter := routerGroup.Group("/auth")
 
 	// health router

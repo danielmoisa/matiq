@@ -368,6 +368,43 @@ func (c *Client) HealthCheck(ctx context.Context) error {
 	return nil
 }
 
+// GetUserGroups retrieves groups for a user
+func (c *Client) GetUserGroups(ctx context.Context, userID string) ([]string, error) {
+	if err := c.ensureAdminToken(ctx); err != nil {
+		return nil, fmt.Errorf("failed to get admin token: %w", err)
+	}
+
+	groups, err := c.client.GetUserGroups(ctx, c.adminToken.AccessToken, c.config.Realm, userID, gocloak.GetGroupsParams{})
+	if err != nil {
+		return nil, fmt.Errorf("failed to get user groups: %w", err)
+	}
+
+	var groupNames []string
+	for _, group := range groups {
+		if group.Name != nil {
+			groupNames = append(groupNames, *group.Name)
+		}
+	}
+
+	return groupNames, nil
+}
+
+// CheckUserInGroup checks if user is in a specific group
+func (c *Client) CheckUserInGroup(ctx context.Context, userID, groupName string) (bool, error) {
+	groups, err := c.GetUserGroups(ctx, userID)
+	if err != nil {
+		return false, err
+	}
+
+	for _, group := range groups {
+		if group == groupName {
+			return true, nil
+		}
+	}
+
+	return false, nil
+}
+
 // Helper functions
 func getStringPtr(ptr *string) string {
 	if ptr == nil {

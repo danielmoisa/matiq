@@ -42,11 +42,11 @@ func (impl *WorkflowRepository) UpdateWholeFlowAction(action *model.Workflow) er
 	return nil
 }
 
-func (impl *WorkflowRepository) RetrieveWorkflowByTeamIDAndID(teamID int, workflowID int) (*model.Workflow, error) {
+func (impl *WorkflowRepository) RetrieveWorkflowByID(workflowID int) (*model.Workflow, error) {
 	var workflow model.Workflow
-	if err := impl.db.Where("team_id = ? AND id = ?", teamID, workflowID).First(&workflow).Error; err != nil {
+	if err := impl.db.Where("id = ?", workflowID).First(&workflow).Error; err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
-			return nil, fmt.Errorf("workflow not found for teamID %d and workflowID %d", teamID, workflowID)
+			return nil, fmt.Errorf("workflow not found for workflowID %d", workflowID)
 		}
 		return nil, err
 	}
