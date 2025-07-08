@@ -107,7 +107,7 @@ func initServer() (*Server, error) {
 }
 
 func (server *Server) Start() {
-	server.logger.Infow("Starting workflow-builder-backend...")
+	server.logger.Infow("Starting auto runner server...")
 
 	// init
 	gin.SetMode(server.config.ServerMode)
@@ -130,18 +130,18 @@ func (server *Server) Start() {
 	}
 }
 
-// @title			Go Flow Automation API
-// @version		1.0
-// @description	A auth and authorization application built with Go
-// @termsOfService	http://swagger.io/terms/
-// @contact.name	API Support
-// @contact.url	http://www.swagger.io/support
-// @contact.email	support@swagger.io
-// @license.name	MIT
-// @license.url	https://opensource.org/licenses/MIT
-// @host			localhost:8001
-// @BasePath		/api/v1
-// @schemes		http https
+// @title Auto Runner Automation API
+// @version 1.0
+// @description API for managing automation workflows and tasks.
+// @termsOfService http://swagger.io/terms/
+// @contact.name API Support
+// @contact.url http://www.swagger.io/support
+// @contact.email support@swagger.io
+// @license.name MIT
+// @license.url https://opensource.org/licenses/MIT
+// @host localhost:8001
+// @BasePath /api/v1
+// @schemes http https
 // @securityDefinitions.apikey BearerAuth
 // @in header
 // @name Authorization

@@ -5,8 +5,8 @@
     ],
     "swagger": "2.0",
     "info": {
-        "description": "A auth and authorization application built with Go",
-        "title": "Go Flow Automation API",
+        "description": "API for managing automation workflows and tasks.",
+        "title": "Auto Runner Automation API",
         "termsOfService": "http://swagger.io/terms/",
         "contact": {
             "name": "API Support",
@@ -278,12 +278,18 @@
         }
     },
     "definitions": {
-        "github_com_danielmoisa_workflow-builder_internal_driver_keycloak.TokenInfo": {
+        "github_com_danielmoisa_auto-runner_internal_driver_keycloak.TokenInfo": {
             "type": "object",
             "properties": {
                 "claims": {
                     "type": "object",
                     "additionalProperties": true
+                },
+                "email": {
+                    "type": "string"
+                },
+                "enabled": {
+                    "type": "boolean"
                 },
                 "roles": {
                     "type": "array",
@@ -459,7 +465,7 @@
             "type": "object",
             "properties": {
                 "data": {
-                    "$ref": "#/definitions/github_com_danielmoisa_workflow-builder_internal_driver_keycloak.TokenInfo"
+                    "$ref": "#/definitions/github_com_danielmoisa_auto-runner_internal_driver_keycloak.TokenInfo"
                 },
                 "message": {
                     "type": "string"

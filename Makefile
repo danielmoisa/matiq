@@ -3,7 +3,7 @@
 all: build
 
 run:
-	go run ./cmd/workflow-builder-backend/main.go
+	go run ./cmd/auto-runner/main.go
 
 run-web:
 	cd web && npm run dev
@@ -11,19 +11,16 @@ run-web:
 build: build-http-server build-websocket-server build-http-server-internal
 
 build-http-server:
-	go build -o bin/workflow-builder-backend src/cmd/workflow-builder-backend/main.go
+	go build -o bin/auto-runner src/cmd/auto-runner/main.go
 
 build-websocket-server:
-	go build -o bin/workflow-builder-backend-websocket src/cmd/workflow-builder-backend-websocket/main.go
+	go build -o bin/auto-runner-websocket src/cmd/auto-runner-websocket/main.go
 
-build-http-server-internal:
-	go build -o bin/workflow-builder-backend-internal src/cmd/workflow-builder-backend-internal/main.go
-	
 docker-compose:
 	docker-compose up -d
 
 swagger:
-	swag init --parseDependency --parseInternal -g ./cmd/workflow-builder-backend/main.go -o docs
+	swag init --parseDependency --parseInternal -g ./cmd/auto-runner/main.go -o docs
 
 
 test:

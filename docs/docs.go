@@ -280,12 +280,18 @@ const docTemplate = `{
         }
     },
     "definitions": {
-        "github_com_danielmoisa_workflow-builder_internal_driver_keycloak.TokenInfo": {
+        "github_com_danielmoisa_auto-runner_internal_driver_keycloak.TokenInfo": {
             "type": "object",
             "properties": {
                 "claims": {
                     "type": "object",
                     "additionalProperties": true
+                },
+                "email": {
+                    "type": "string"
+                },
+                "enabled": {
+                    "type": "boolean"
                 },
                 "roles": {
                     "type": "array",
@@ -461,7 +467,7 @@ const docTemplate = `{
             "type": "object",
             "properties": {
                 "data": {
-                    "$ref": "#/definitions/github_com_danielmoisa_workflow-builder_internal_driver_keycloak.TokenInfo"
+                    "$ref": "#/definitions/github_com_danielmoisa_auto-runner_internal_driver_keycloak.TokenInfo"
                 },
                 "message": {
                     "type": "string"
@@ -491,8 +497,8 @@ var SwaggerInfo = &swag.Spec{
 	Host:             "localhost:8001",
 	BasePath:         "/api/v1",
 	Schemes:          []string{"http", "https"},
-	Title:            "Go Flow Automation API",
-	Description:      "A auth and authorization application built with Go",
+	Title:            "Auto Runner Automation API",
+	Description:      "API for managing automation workflows and tasks.",
 	InfoInstanceName: "swagger",
 	SwaggerTemplate:  docTemplate,
 	LeftDelim:        "{{",
