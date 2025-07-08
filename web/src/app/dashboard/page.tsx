@@ -41,11 +41,8 @@ export default function DashboardPage() {
           <div className="border-4 border-dashed border-gray-200 rounded-lg p-8">
             <div className="text-center">
               <h2 className="text-3xl font-extrabold text-gray-900 mb-4">
-                Welcome to your Dashboard
+                Welcome to Dashboard
               </h2>
-              <p className="text-gray-600 mb-8">
-                You are successfully authenticated with Keycloak through NextAuth.js
-              </p>
               
               {/* User info card */}
               <div className="bg-white shadow rounded-lg p-6 max-w-md mx-auto">

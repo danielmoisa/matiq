@@ -1,6 +1,6 @@
 "use client"
 
-import { useSession } from 'next-auth/react'
+import { useSession, signOut } from 'next-auth/react'
 import { useRouter } from 'next/navigation'
 import { useEffect } from 'react'
 
@@ -9,16 +9,36 @@ export function useAuth(requireAuth = true) {
   const router = useRouter()
 
   useEffect(() => {
+    // Handle session errors (like token refresh failures)
+    if (session?.error === 'RefreshAccessTokenError') {
+      signOut({ 
+        redirect: false 
+      }).then(() => {
+        router.push('/auth/login?error=SessionExpired')
+      })
+      return
+    }
+
+    // Handle token expiration
+    if (session?.expiresAt && Date.now() > session.expiresAt) {
+      signOut({ 
+        redirect: false 
+      }).then(() => {
+        router.push('/auth/login?error=SessionExpired')
+      })
+      return
+    }
+
     if (requireAuth && status === 'unauthenticated') {
       router.push('/auth/login')
     }
-  }, [requireAuth, status, router])
+  }, [requireAuth, status, router, session])
 
   return {
     session,
     status,
     isLoading: status === 'loading',
-    isAuthenticated: status === 'authenticated',
+    isAuthenticated: status === 'authenticated' && !session?.error,
     user: session?.user,
     accessToken: session?.accessToken,
     refreshToken: session?.refreshToken,

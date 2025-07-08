@@ -1,4 +1,4 @@
-import { getSession } from 'next-auth/react'
+import { getSession, signOut } from 'next-auth/react'
 
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL
 
@@ -20,8 +20,22 @@ export async function authenticatedFetch(
 ): Promise<Response> {
   const session = await getSession()
 
-  if (!session?.accessToken) {
+  if (!session?.accessToken || session?.error) {
+    // Handle session errors or missing tokens
+    if (session?.error === 'RefreshAccessTokenError') {
+      // Token refresh failed, redirect to login
+      await signOut({ redirect: false })
+      window.location.href = '/auth/login?error=SessionExpired'
+      throw new AuthenticatedApiError('Session expired', 401)
+    }
     throw new AuthenticatedApiError('No access token available', 401)
+  }
+
+  // Check if token is expired
+  if (session.expiresAt && Date.now() > session.expiresAt) {
+    await signOut({ redirect: false })
+    window.location.href = '/auth/login?error=SessionExpired'
+    throw new AuthenticatedApiError('Session expired', 401)
   }
 
   const headers = {
@@ -34,6 +48,13 @@ export async function authenticatedFetch(
     ...options,
     headers,
   })
+
+  // Handle 401 responses (unauthorized)
+  if (response.status === 401) {
+    await signOut({ redirect: false })
+    window.location.href = '/auth/login?error=SessionExpired'
+    throw new AuthenticatedApiError('Session expired', 401)
+  }
 
   if (!response.ok) {
     const errorData = await response.json().catch(() => ({}))
