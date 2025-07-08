@@ -4,6 +4,7 @@ import { useState } from 'react';
 import Link from 'next/link';
 import { useWorkflowList } from '@/hooks/useWorkflow';
 import { WorkflowService } from '@/services/workflow-service';
+import { AppLayout } from '@/components/layout/AppLayout';
 
 export default function WorkflowsPage() {
   const { workflows, loading, error, loadWorkflows, deleteWorkflow } = useWorkflowList();
@@ -55,40 +56,19 @@ export default function WorkflowsPage() {
 
   if (loading && workflows.length === 0) {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
-        <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
-          <p className="text-gray-600">Loading workflows...</p>
+      <AppLayout>
+        <div className="min-h-[80vh] flex items-center justify-center">
+          <div className="text-center">
+            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-indigo-600 mx-auto mb-4"></div>
+            <p className="text-gray-600">Loading workflows...</p>
+          </div>
         </div>
-      </div>
+      </AppLayout>
     );
   }
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      {/* Header */}
-      <div className="bg-white shadow-sm border-b">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex justify-between items-center py-6">
-            <div>
-              <div className="flex items-center space-x-2 text-sm text-gray-500 mb-1">
-                <Link href="/" className="hover:text-gray-700">Home</Link>
-                <span>›</span>
-                <span>Workflows</span>
-              </div>
-              <h1 className="text-3xl font-bold text-gray-900">Workflows</h1>
-              <p className="text-gray-600 mt-1">Manage and create your automation workflows</p>
-            </div>
-            <button
-              onClick={() => setShowCreateModal(true)}
-              className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg font-medium transition-colors flex items-center space-x-2"
-            >
-              <span>+</span>
-              <span>Create Workflow</span>
-            </button>
-          </div>
-        </div>
-      </div>
+    <AppLayout>
 
       {/* Content */}
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
@@ -173,7 +153,7 @@ export default function WorkflowsPage() {
           loading={createLoading}
         />
       )}
-    </div>
+    </AppLayout>
   );
 }
 

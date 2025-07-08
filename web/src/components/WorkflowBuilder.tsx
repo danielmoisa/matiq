@@ -4,7 +4,7 @@ import { useState } from 'react';
 import { useWorkflow } from '@/hooks/useWorkflow';
 import PropertiesPanel from './PropertiesPanel';
 import { WorkflowNode, TriggerType, EventType } from '@/types/workflow';
-import Header from './Header';
+import WorkflowHeader from './WorkflowHeader';
 import Sidebar from './Sidebar';
 import Canvas from './Canvas';
 
@@ -50,7 +50,7 @@ export default function WorkflowBuilder({ workflowId }: WorkflowBuilderProps) {
 
 
   return (
-    <div className="h-screen flex flex-col">
+    <div className="h-full flex flex-col">
       {error && (
         <div className="bg-red-50 border-l-4 border-red-400 p-4">
           <div className="flex">
@@ -67,7 +67,7 @@ export default function WorkflowBuilder({ workflowId }: WorkflowBuilderProps) {
           </div>
         </div>
       )}
-      <Header 
+      <WorkflowHeader 
         workflowName={workflow?.name}
         onSave={saveWorkflow}
         onPublish={() => {
