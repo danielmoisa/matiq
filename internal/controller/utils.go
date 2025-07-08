@@ -6,8 +6,8 @@ import (
 	"net/http"
 	"strconv"
 
-	"github.com/danielmoisa/workflow-builder/internal/response"
-	"github.com/danielmoisa/workflow-builder/internal/utils/idconvertor"
+	"github.com/danielmoisa/auto-runner/internal/response"
+	"github.com/danielmoisa/auto-runner/internal/utils/idconvertor"
 	"github.com/gin-gonic/gin"
 )
 

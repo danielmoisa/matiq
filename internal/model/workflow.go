@@ -4,9 +4,9 @@ import (
 	"encoding/json"
 	"time"
 
-	"github.com/danielmoisa/workflow-builder/internal/request"
-	"github.com/danielmoisa/workflow-builder/internal/utils/idconvertor"
-	"github.com/danielmoisa/workflow-builder/internal/utils/resourcelist"
+	"github.com/danielmoisa/auto-runner/internal/request"
+	"github.com/danielmoisa/auto-runner/internal/utils/idconvertor"
+	"github.com/danielmoisa/auto-runner/internal/utils/resourcelist"
 	"github.com/google/uuid"
 )
 

@@ -1,4 +1,4 @@
-module github.com/danielmoisa/workflow-builder
+module github.com/danielmoisa/auto-runner
 
 go 1.23.5
 

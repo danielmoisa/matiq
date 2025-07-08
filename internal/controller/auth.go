@@ -7,7 +7,7 @@ import (
 	"strings"
 	"time"
 
-	"github.com/danielmoisa/workflow-builder/internal/driver/keycloak"
+	"github.com/danielmoisa/auto-runner/internal/driver/keycloak"
 	"github.com/gin-gonic/gin"
 )
 

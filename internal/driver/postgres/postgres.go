@@ -4,8 +4,8 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/danielmoisa/workflow-builder/internal/config"
-	"github.com/danielmoisa/workflow-builder/internal/model"
+	"github.com/danielmoisa/auto-runner/internal/config"
+	"github.com/danielmoisa/auto-runner/internal/model"
 	"go.uber.org/zap"
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"

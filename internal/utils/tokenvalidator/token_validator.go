@@ -6,7 +6,7 @@ import (
 
 	"crypto/md5"
 
-	"github.com/danielmoisa/workflow-builder/internal/config"
+	"github.com/danielmoisa/auto-runner/internal/config"
 )
 
 type RequestTokenValidator struct {

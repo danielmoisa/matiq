@@ -3,9 +3,9 @@ package response
 import (
 	"time"
 
-	"github.com/danielmoisa/workflow-builder/internal/model"
-	"github.com/danielmoisa/workflow-builder/internal/utils/idconvertor"
-	"github.com/danielmoisa/workflow-builder/internal/utils/resourcelist"
+	"github.com/danielmoisa/auto-runner/internal/model"
+	"github.com/danielmoisa/auto-runner/internal/utils/idconvertor"
+	"github.com/danielmoisa/auto-runner/internal/utils/resourcelist"
 	"github.com/google/uuid"
 )
 

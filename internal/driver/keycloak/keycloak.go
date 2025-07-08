@@ -7,7 +7,7 @@ import (
 	"time"
 
 	"github.com/Nerzal/gocloak/v13"
-	"github.com/danielmoisa/workflow-builder/internal/config"
+	"github.com/danielmoisa/auto-runner/internal/config"
 )
 
 // Config holds Keycloak configuration

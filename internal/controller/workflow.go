@@ -6,7 +6,7 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/google/uuid"
 
-	"github.com/danielmoisa/workflow-builder/internal/response"
+	"github.com/danielmoisa/auto-runner/internal/response"
 )
 
 // func (controller *Controller) CreateWorkflow(c *gin.Context) {

@@ -1,11 +1,11 @@
 package controller
 
 import (
-	"github.com/danielmoisa/workflow-builder/internal/driver/keycloak"
-	"github.com/danielmoisa/workflow-builder/internal/repository"
-	"github.com/danielmoisa/workflow-builder/internal/utils/cache"
-	"github.com/danielmoisa/workflow-builder/internal/utils/drive"
-	"github.com/danielmoisa/workflow-builder/internal/utils/tokenvalidator"
+	"github.com/danielmoisa/auto-runner/internal/driver/keycloak"
+	"github.com/danielmoisa/auto-runner/internal/repository"
+	"github.com/danielmoisa/auto-runner/internal/utils/cache"
+	"github.com/danielmoisa/auto-runner/internal/utils/drive"
+	"github.com/danielmoisa/auto-runner/internal/utils/tokenvalidator"
 )
 
 type Controller struct {

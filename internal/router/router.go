@@ -1,7 +1,7 @@
 package router
 
 import (
-	"github.com/danielmoisa/workflow-builder/internal/controller"
+	"github.com/danielmoisa/auto-runner/internal/controller"
 	"github.com/gin-gonic/gin"
 )
 

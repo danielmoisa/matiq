@@ -3,8 +3,8 @@ package request
 import (
 	"encoding/json"
 
-	"github.com/danielmoisa/workflow-builder/internal/utils/idconvertor"
-	"github.com/danielmoisa/workflow-builder/internal/utils/resourcelist"
+	"github.com/danielmoisa/auto-runner/internal/utils/idconvertor"
+	"github.com/danielmoisa/auto-runner/internal/utils/resourcelist"
 )
 
 // The run action HTTP request body like:

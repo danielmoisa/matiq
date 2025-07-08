@@ -4,7 +4,7 @@ import (
 	"math"
 	"strconv"
 
-	"github.com/danielmoisa/workflow-builder/internal/config"
+	"github.com/danielmoisa/auto-runner/internal/config"
 )
 
 var table = ""
