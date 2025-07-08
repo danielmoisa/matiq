@@ -21,7 +21,6 @@ func (r *Router) RegisterRouters(engine *gin.Engine) {
 
 	// init route
 	routerGroup := engine.Group("/api/v1")
-
 	healthRouter := routerGroup.Group("/health")
 	workflowRouter := routerGroup.Group("/teams/:teamID/workflow")
 	authRouter := routerGroup.Group("/auth")
@@ -29,19 +28,22 @@ func (r *Router) RegisterRouters(engine *gin.Engine) {
 	// health router
 	healthRouter.GET("", r.Controller.GetHealth)
 
-	// auth action routers (public endpoints)
+	// Auth routes
+	// Public -- no authentication required
 	authRouter.POST("/login", r.Controller.Login)
 	authRouter.POST("/register", r.Controller.Register)
 	authRouter.POST("/refresh", r.Controller.RefreshToken)
 	authRouter.POST("/logout", r.Controller.Logout)
 	authRouter.GET("/validate", r.Controller.ValidateToken)
 
-	// protected auth endpoints (require authentication)
+	// Auth routes
+	// Protected -- requires Bearer token
 	protectedAuthRouter := authRouter.Group("")
 	protectedAuthRouter.Use(r.Controller.AuthMiddleware())
 	protectedAuthRouter.GET("/profile", r.Controller.GetProfile)
 
-	// protected workflow routers (require authentication)
+	// Workflow routes
+	// Protected -- requires Bearer token
 	workflowRouter.Use(r.Controller.AuthMiddleware())
 	workflowRouter.POST("", r.Controller.CreateWorkflow)
 	workflowRouter.GET("/:workflowID", r.Controller.GetWorkflow)

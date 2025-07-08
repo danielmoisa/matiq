@@ -1,6 +1,35 @@
-import Link from 'next/link';
+"use client"
+
+import Link from 'next/link'
+import { useOptionalAuth } from '@/hooks/useAuth'
+import { useRouter } from 'next/navigation'
+import { useEffect } from 'react'
 
 export default function Home() {
+  const { isAuthenticated, isLoading } = useOptionalAuth()
+  const router = useRouter()
+
+  useEffect(() => {
+    if (isAuthenticated) {
+      router.push('/dashboard')
+    }
+  }, [isAuthenticated, router])
+
+  if (isLoading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-blue-600 mx-auto"></div>
+          <p className="mt-4 text-gray-600">Loading...</p>
+        </div>
+      </div>
+    )
+  }
+
+  if (isAuthenticated) {
+    return null // Will redirect via useEffect
+  }
+
   return (
     <main className="min-h-screen bg-gray-50">
       {/* Header */}
@@ -11,12 +40,20 @@ export default function Home() {
               <h1 className="text-3xl font-bold text-gray-900">Workflow Builder</h1>
               <p className="text-gray-600 mt-1">Design, build, and manage your automation workflows</p>
             </div>
-            <Link
-              href="/workflows"
-              className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-lg font-medium transition-colors"
-            >
-              View Workflows
-            </Link>
+            <div className="flex space-x-4">
+              <Link
+                href="/auth/login"
+                className="border border-blue-600 text-blue-600 hover:bg-blue-600 hover:text-white px-6 py-3 rounded-lg font-medium transition-colors"
+              >
+                Sign In
+              </Link>
+              <Link
+                href="/auth/register"
+                className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-lg font-medium transition-colors"
+              >
+                Get Started
+              </Link>
+            </div>
           </div>
         </div>
       </div>
@@ -35,16 +72,16 @@ export default function Home() {
           
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <Link
-              href="/workflows"
+              href="/auth/register"
               className="bg-blue-600 hover:bg-blue-700 text-white px-8 py-4 rounded-lg font-medium transition-colors text-lg"
             >
-              Get Started
+              Get Started Free
             </Link>
             <Link
-              href="/workflows"
+              href="/auth/login"
               className="border border-gray-300 hover:border-gray-400 text-gray-700 px-8 py-4 rounded-lg font-medium transition-colors text-lg"
             >
-              Browse Workflows
+              Sign In
             </Link>
           </div>
         </div>
