@@ -4,6 +4,7 @@ import (
 	"context"
 
 	"github.com/gin-gonic/gin"
+	"github.com/google/uuid"
 
 	"github.com/danielmoisa/workflow-builder/internal/response"
 )
@@ -217,11 +218,10 @@ import (
 // }
 
 func (controller *Controller) GetWorkflow(c *gin.Context) {
-	// fetch needed param
-	// teamID, errInGetTeamID := controller.GetMagicIntParamFromRequest(c, PARAM_TEAM_ID)
-	workflowID, errInGetAppID := controller.GetMagicIntParamFromRequest(c, PARAM_WORKFLOW_ID)
-	// userAuthToken, errInGetAuthToken := controller.GetUserAuthTokenFromHeader(c)
-	if errInGetAppID != nil {
+	// Get workflow ID directly as string from URL parameter
+	workflowIDParam := c.Param("workflowID")
+	if workflowIDParam == "" {
+		controller.FeedbackBadRequest(c, ERROR_FLAG_VALIDATE_REQUEST_PARAM_FAILED, "workflow ID is required")
 		return
 	}
 
@@ -256,8 +256,15 @@ func (controller *Controller) GetWorkflow(c *gin.Context) {
 		}
 	}
 
+	// Parse workflow ID string to UUID
+	parsedWorkflowID, errInParse := uuid.Parse(workflowIDParam)
+	if errInParse != nil {
+		controller.FeedbackBadRequest(c, ERROR_FLAG_VALIDATE_REQUEST_PARAM_FAILED, "invalid workflow ID format: "+errInParse.Error())
+		return
+	}
+
 	// fetch data
-	workflow, errInGetAction := controller.Repository.WorkflowRepository.RetrieveWorkflowByID(workflowID)
+	workflow, errInGetAction := controller.Repository.WorkflowRepository.RetrieveWorkflowByID(parsedWorkflowID)
 	if errInGetAction != nil {
 		controller.FeedbackBadRequest(c, ERROR_FLAG_CAN_NOT_GET_WORKFLOW, "get workflow error: "+errInGetAction.Error())
 		return

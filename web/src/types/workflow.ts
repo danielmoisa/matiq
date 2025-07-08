@@ -54,19 +54,20 @@ export interface Connection {
 
 // Backend response structure (matches actual Go backend response)
 export interface WorkflowBackend {
-  uid: string;                   // UUID from backend
+  workflowID: string;           // Main workflow ID (from JSON tag)
+  uid: string;                  // UUID from backend
   teamID: string;               // Encoded team ID
   version: number;              // Version number
-  resourceID: string;           // Encoded resource ID
+  resourceID?: string;          // Encoded resource ID (optional field)
   displayName: string;          // Workflow name
   workflowType: string;         // Workflow type as string
   isVirtualResource: boolean;   // Virtual resource flag
   content: {                    // Content containing nodes and connections
-    nodes: WorkflowNode[];
-    connections: Connection[];
-    resourceID: number;
-    runByAnonymous: boolean;
-    teamID: number;
+    nodes?: WorkflowNode[];
+    connections?: Connection[];
+    resourceID?: number;
+    runByAnonymous?: boolean;
+    teamID?: number;
   };
   transformer: unknown;         // Transformer data (can be null)
   triggerMode: string;          // Trigger mode as string
@@ -140,7 +141,7 @@ export function convertBackendToFrontend(backend: WorkflowBackend | null | undef
   }
 
   return {
-    id: backend.resourceID || backend.uid || 'unknown', // Fallback to uid if resourceID missing
+    id: backend.workflowID || backend.resourceID || backend.uid || 'unknown', // Use workflowID first
     name: backend.displayName || 'Untitled Workflow',
     description: "", // Backend does not have description field
     nodes,

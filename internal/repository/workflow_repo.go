@@ -5,6 +5,7 @@ import (
 	"fmt"
 
 	"github.com/danielmoisa/workflow-builder/internal/model"
+	"github.com/google/uuid"
 	"go.uber.org/zap"
 	"gorm.io/gorm"
 )
@@ -42,9 +43,9 @@ func (impl *WorkflowRepository) UpdateWholeFlowAction(action *model.Workflow) er
 	return nil
 }
 
-func (impl *WorkflowRepository) RetrieveWorkflowByID(workflowID int) (*model.Workflow, error) {
+func (impl *WorkflowRepository) RetrieveWorkflowByID(workflowID uuid.UUID) (*model.Workflow, error) {
 	var workflow model.Workflow
-	if err := impl.db.Where("id = ?", workflowID).First(&workflow).Error; err != nil {
+	if err := impl.db.Where("uid = ?", workflowID).First(&workflow).Error; err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
 			return nil, fmt.Errorf("workflow not found for workflowID %d", workflowID)
 		}

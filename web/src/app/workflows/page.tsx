@@ -103,7 +103,7 @@ export default function WorkflowsPage() {
           // Workflows grid
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {workflows.map((workflow) => (
-              <div key={workflow.id} className="bg-white rounded-lg shadow-sm border border-gray-200 hover:shadow-md transition-shadow">
+              <div key={workflow.uid} className="bg-white rounded-lg shadow-sm border border-gray-200 hover:shadow-md transition-shadow">
                 <div className="p-6">
                   <div className="flex justify-between items-start mb-4">
                     <h3 className="text-lg font-semibold text-gray-900 truncate">{workflow.name}</h3>
@@ -128,7 +128,7 @@ export default function WorkflowsPage() {
                   
                   <div className="flex space-x-2">
                     <Link
-                      href={`/workflows/${workflow.id}`}
+                      href={`/workflows/${workflow.uid}`}
                       className="flex-1 bg-blue-600 hover:bg-blue-700 text-white text-center py-2 rounded-md text-sm font-medium transition-colors"
                     >
                       Open
