@@ -1,5 +1,7 @@
+import { getSession } from 'next-auth/react';
+
 // API Configuration
-const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8080/api/v1';
+const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL;
 
 // HTTP Client with error handling
 class ApiClient {
@@ -9,15 +11,30 @@ class ApiClient {
     this.baseURL = baseURL;
   }
 
+  private async getAuthHeaders(): Promise<Record<string, string>> {
+    const session = await getSession();
+    const headers: Record<string, string> = {
+      'Content-Type': 'application/json',
+    };
+
+    if (session?.accessToken && session?.tokenType) {
+      headers['Authorization'] = `${session.tokenType} ${session.accessToken}`;
+    }
+
+    return headers;
+  }
+
   private async request<T>(
     endpoint: string,
     options: RequestInit = {}
   ): Promise<T> {
     const url = `${this.baseURL}${endpoint}`;
     
+    const authHeaders = await this.getAuthHeaders();
+    
     const config: RequestInit = {
       headers: {
-        'Content-Type': 'application/json',
+        ...authHeaders,
         ...options.headers,
       },
       ...options,
@@ -61,4 +78,4 @@ class ApiClient {
   }
 }
 
-export const apiClient = new ApiClient(API_BASE_URL);
+export const apiClient = new ApiClient(API_BASE_URL as string);

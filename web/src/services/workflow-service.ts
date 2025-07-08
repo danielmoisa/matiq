@@ -4,7 +4,6 @@ import {
   WorkflowNode, 
   Connection, 
   WorkflowBackend,
-  ApiResponse,
   convertBackendToFrontend,
   convertFrontendToBackendRequest
 } from '@/types/workflow';
@@ -13,13 +12,15 @@ import {
 export class WorkflowService {
   
   // Get all workflows for a team
-  static async getWorkflows(teamId: number = 1): Promise<Workflow[]> { 
+  static async getWorkflows(): Promise<Workflow[]> { 
     try {
-      const response = await apiClient.get<ApiResponse<WorkflowBackend[]>>(`/teams/${teamId}/workflow`);
-      const backendWorkflows = response.data || [];
+      const response = await apiClient.get<{ workflows: WorkflowBackend[] }>(`/api/v1/workflows`);
+      
+      // Extract workflows array from response object
+      const workflowsArray = response?.workflows || [];
       
       // Convert backend workflows to frontend format, filtering out any invalid ones
-      return backendWorkflows
+      return workflowsArray
         .filter(workflow => workflow != null) // Filter out null/undefined workflows
         .map(convertBackendToFrontend);
     } catch (error) {
@@ -28,11 +29,10 @@ export class WorkflowService {
     }
   }
 
-  // Get a specific workflow by team ID and workflow ID
-  static async getWorkflow(workflowId: string, teamId: number = 1): Promise<Workflow> { 
+  // Get a specific workflow by workflow ID
+  static async getWorkflow(workflowId: string): Promise<Workflow> { 
     try {
-      const response = await apiClient.get<WorkflowBackend>(`/teams/${teamId}/workflow/${workflowId}`);
-      const backendWorkflow = response;
+      const backendWorkflow = await apiClient.get<WorkflowBackend>(`/api/v1/workflows/${workflowId}`);
       
       if (!backendWorkflow) {
         throw new Error('Workflow not found or response is empty');
@@ -47,12 +47,11 @@ export class WorkflowService {
   }
 
   // Create a new workflow
-  static async createWorkflow(workflow: Partial<Workflow>, teamId: number = 1): Promise<Workflow> {
+  static async createWorkflow(workflow: Partial<Workflow>): Promise<Workflow> {
     try {
       const requestData = convertFrontendToBackendRequest(workflow);
       
-      const response = await apiClient.post<ApiResponse<WorkflowBackend>>(`/teams/${teamId}/workflow`, requestData);
-      const backendWorkflow = response.data;
+      const backendWorkflow = await apiClient.post<WorkflowBackend>(`/api/v1/workflows`, requestData);
       
       if (!backendWorkflow) {
         throw new Error('Create workflow response is empty');
@@ -68,17 +67,15 @@ export class WorkflowService {
   // Update an existing workflow
   static async updateWorkflow(
     workflowId: string, 
-    workflow: Partial<Workflow>,
-    teamId: number = 1
+    workflow: Partial<Workflow>
   ): Promise<Workflow> {
     try {
       const requestData = convertFrontendToBackendRequest(workflow);
       
-      const response = await apiClient.put<ApiResponse<WorkflowBackend>>(
-        `/teams/${teamId}/workflow/${workflowId}`, 
+      const backendWorkflow = await apiClient.put<WorkflowBackend>(
+        `/api/v1/workflows/${workflowId}`, 
         requestData
       );
-      const backendWorkflow = response.data;
       
       if (!backendWorkflow) {
         throw new Error('Update workflow response is empty');
@@ -92,49 +89,44 @@ export class WorkflowService {
   }
 
   // Delete a workflow
-  static async deleteWorkflow(workflowId: string, teamId: number = 1): Promise<void> {
-    await apiClient.delete<ApiResponse<void>>(`/teams/${teamId}/workflow/${workflowId}`);
+  static async deleteWorkflow(workflowId: string): Promise<void> {
+    await apiClient.delete<void>(`/api/v1/workflows/${workflowId}`);
   }
 
   // Execute a workflow
   static async executeWorkflow(
     workflowId: string, 
-    input?: Record<string, unknown>,
-    teamId: number = 1
+    input?: Record<string, unknown>
   ): Promise<{ executionId: string }> {
-    const response = await apiClient.post<ApiResponse<{ executionId: string }>>(
-      `/teams/${teamId}/workflow/${workflowId}/execute`, 
+    return await apiClient.post<{ executionId: string }>(
+      `/api/v1/workflows/${workflowId}/execute`, 
       { input }
     );
-    return response.data;
   }
 
   // Get workflow execution status
   static async getExecutionStatus(
     workflowId: string, 
-    executionId: string,
-    teamId: number = 1
+    executionId: string
   ): Promise<{
     status: 'running' | 'completed' | 'failed' | 'cancelled';
     progress: number;
     result?: unknown;
     error?: string;
   }> {
-    const response = await apiClient.get<ApiResponse<{
+    return await apiClient.get<{
       status: 'running' | 'completed' | 'failed' | 'cancelled';
       progress: number;
       result?: unknown;
       error?: string;
-    }>>(`/teams/${teamId}/workflow/${workflowId}/executions/${executionId}`);
-    return response.data;
+    }>(`/api/v1/workflows/${workflowId}/executions/${executionId}`);
   }
 
   // Save workflow (nodes and connections)
   static async saveWorkflow(
     workflowId: string, 
     nodes: WorkflowNode[], 
-    connections: Connection[],
-    teamId: number = 1
+    connections: Connection[]
   ): Promise<Workflow> {
     try {
       const requestData = convertFrontendToBackendRequest(
@@ -143,11 +135,10 @@ export class WorkflowService {
         connections
       );
       
-      const response = await apiClient.put<ApiResponse<WorkflowBackend>>(
-        `/teams/${teamId}/workflow/${workflowId}`,
+      const backendWorkflow = await apiClient.put<WorkflowBackend>(
+        `/api/v1/workflows/${workflowId}`,
         requestData
       );
-      const backendWorkflow = response.data;
       
       if (!backendWorkflow) {
         throw new Error('Save workflow response is empty');
@@ -163,14 +154,12 @@ export class WorkflowService {
   // Activate/Deactivate workflow (if backend supports this)
   static async toggleWorkflowStatus(
     workflowId: string, 
-    isActive: boolean,
-    teamId: number = 1
+    isActive: boolean
   ): Promise<Workflow> {
-    const response = await apiClient.put<ApiResponse<WorkflowBackend>>(
-      `/teams/${teamId}/workflow/${workflowId}/status`, 
+    const backendWorkflow = await apiClient.put<WorkflowBackend>(
+      `/api/v1/workflows/${workflowId}/status`, 
       { isActive }
     );
-    const backendWorkflow = response.data;
     
     return convertBackendToFrontend(backendWorkflow);
   }
@@ -181,14 +170,13 @@ export class WorkflowService {
     response?: unknown;
     error?: string;
   }> {
-    const response = await apiClient.post<ApiResponse<{
+    return await apiClient.post<{
       success: boolean;
       response?: unknown;
       error?: string;
-    }>>('/webhook/test', {
+    }>('/webhook/test', {
       url: webhookUrl,
       payload
     });
-    return response.data;
   }
 }
