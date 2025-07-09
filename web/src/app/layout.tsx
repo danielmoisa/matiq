@@ -14,7 +14,7 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Workflow Builder - Automation Tool",
+  title: "Auto Runner - Automation Tool",
   description: "Connect and automate databases, APIs, and services without code",
 };
 

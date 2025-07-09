@@ -1,10 +1,10 @@
-# Workflow Builder Frontend
+# Auto Runner Frontend
 
 A React/Next.js frontend for building and managing automated workflows with a visual drag-and-drop interface.
 
 ## Features
 
-- **Visual Workflow Builder**: Drag-and-drop interface for creating workflows
+- **Visual Auto Runner**: Drag-and-drop interface for creating workflows
 - **Node Types**: Support for triggers, databases, APIs, and action nodes
 - **Real-time Connections**: Connect nodes with arrows to define workflow flow
 - **Properties Panel**: Configure each node with specific settings
