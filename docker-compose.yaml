@@ -1,11 +1,11 @@
 services:
   postgres:
     image: postgres:15
-    container_name: workflow-postgres
+    container_name: matiq-postgres
     environment:
-      POSTGRES_DB: workflow
-      POSTGRES_USER: workflow
-      POSTGRES_PASSWORD: workflow2025
+      POSTGRES_DB: matiq
+      POSTGRES_USER: matiq
+      POSTGRES_PASSWORD: matiq2025
       POSTGRES_INITDB_ARGS: "--encoding=UTF8"
     ports:
       - "5435:5432"
@@ -13,9 +13,9 @@ services:
       - postgres_data:/var/lib/postgresql/data
     restart: unless-stopped
     networks:
-      - workflow-network
+      - matiq-network
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U workflow -d workflow"]
+      test: ["CMD-SHELL", "pg_isready -U matiq -d matiq"]
       interval: 30s
       timeout: 10s
       retries: 3
@@ -35,7 +35,7 @@ services:
       - keycloak_postgres_data:/var/lib/postgresql/data
     restart: unless-stopped
     networks:
-      - workflow-network
+      - matiq-network
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U keycloak -d keycloak"]
       interval: 30s
@@ -44,14 +44,14 @@ services:
 
   redis:
     image: redis:7-alpine
-    container_name: workflow-redis
+    container_name: matiq-redis
     ports:
       - "6375:6379"
     volumes:
       - redis_data:/data
     restart: unless-stopped
     networks:
-      - workflow-network
+      - matiq-network
     healthcheck:
       test: ["CMD", "redis-cli", "ping"]
       interval: 30s
@@ -60,7 +60,7 @@ services:
 
   minio:
     image: minio/minio:latest
-    container_name: workflow-minio
+    container_name: matiq-minio
     environment:
       MINIO_ROOT_USER: minioadmin
       MINIO_ROOT_PASSWORD: minioadmin
@@ -72,7 +72,7 @@ services:
     command: server /data --console-address ":9001"
     restart: unless-stopped
     networks:
-      - workflow-network
+      - matiq-network
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:9000/minio/health/live"]
       interval: 30s
@@ -81,7 +81,7 @@ services:
     
   keycloak:
     image: quay.io/keycloak/keycloak:23.0.0
-    container_name: workflow-keycloak
+    container_name: matiq-keycloak
     environment:
       # Database configuration - Connect to separate Keycloak PostgreSQL
       KC_DB: postgres
@@ -110,7 +110,7 @@ services:
         condition: service_healthy
     restart: unless-stopped
     networks:
-      - workflow-network
+      - matiq-network
     healthcheck:
       test: ["CMD-SHELL", "curl -f http://localhost:8080/health/ready || exit 1"]
       interval: 30s
@@ -126,5 +126,5 @@ volumes:
   keycloak_data:
 
 networks:
-  workflow-network:
+  matiq-network:
     driver: bridge

@@ -26,8 +26,11 @@ A modern workflow automation platform that allows users to design, build, and ma
 
 ## Quick Start
 
-1. Set up Keycloak and configure groups (`workflow-viewers`, `workflow-managers`)
-2. Configure environment variables for database and Keycloak
-3. Run the Go backend: `go run cmd/workflow-builder-backend/main.go`
-4. Start the Next.js frontend: `npm run dev`
-5. Access the application at `http://localhost:3000`
+1. `make docker-compose`
+2. Import keycloak.json to create a new realm at `http://localhost:8888`.
+3. Configure environment variables for database and Keycloak.
+4. Run the Go backend: `make run`
+5. Create web/.env and add the variables from env.local.
+6. Start the Next.js frontend: `make run-web`
+7. Access the application at `http://localhost:3000`
+8. Access api swagger at `http://localhost:8080/swagger/index.html`

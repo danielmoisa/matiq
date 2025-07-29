@@ -103,8 +103,8 @@ type Config struct {
 
 	// Keycloak config
 	KeycloakURL          string `env:"MATIQ_KEYCLOAK_URL" envDefault:"http://localhost:8888"`
-	KeycloakRealm        string `env:"MATIQ_KEYCLOAK_REALM" envDefault:"admin"`
-	KeycloakClientID     string `env:"MATIQ_KEYCLOAK_CLIENT_ID" envDefault:"workflow"`
+	KeycloakRealm        string `env:"MATIQ_KEYCLOAK_REALM" envDefault:"matiq"`
+	KeycloakClientID     string `env:"MATIQ_KEYCLOAK_CLIENT_ID" envDefault:"matiq"`
 	KeycloakClientSecret string `env:"MATIQ_KEYCLOAK_CLIENT_SECRET" envDefault:"qUlGcweKQETa2dPTIn8dH2i6ISBg0KF8"`
 	KeycloakAdminUser    string `env:"MATIQ_KEYCLOAK_ADMIN_USER" envDefault:"admin"`
 	KeycloakAdminPass    string `env:"MATIQ_KEYCLOAK_ADMIN_PASS" envDefault:"admin123"`
