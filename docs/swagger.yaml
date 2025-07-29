@@ -1,6 +1,6 @@
 basePath: /api/v1
 definitions:
-  github_com_danielmoisa_auto-runner_internal_driver_keycloak.TokenInfo:
+  github_com_danielmoisa_matiq_internal_driver_keycloak.TokenInfo:
     properties:
       claims:
         additionalProperties: true
@@ -123,7 +123,7 @@ definitions:
   internal_controller.ValidateTokenResponse:
     properties:
       data:
-        $ref: '#/definitions/github_com_danielmoisa_auto-runner_internal_driver_keycloak.TokenInfo'
+        $ref: '#/definitions/github_com_danielmoisa_matiq_internal_driver_keycloak.TokenInfo'
       message:
         type: string
       success:

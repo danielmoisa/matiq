@@ -4,7 +4,7 @@ import (
 	"errors"
 	"fmt"
 
-	"github.com/danielmoisa/auto-runner/internal/model"
+	"github.com/danielmoisa/matiq/internal/model"
 	"github.com/google/uuid"
 	"go.uber.org/zap"
 	"gorm.io/gorm"

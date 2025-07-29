@@ -7,7 +7,7 @@ import (
 	"time"
 
 	"github.com/Nerzal/gocloak/v13"
-	"github.com/danielmoisa/auto-runner/internal/config"
+	"github.com/danielmoisa/matiq/internal/config"
 )
 
 // ServiceManager manages Keycloak service lifecycle

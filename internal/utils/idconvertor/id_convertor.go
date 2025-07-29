@@ -4,7 +4,7 @@ import (
 	"math"
 	"strconv"
 
-	"github.com/danielmoisa/auto-runner/internal/config"
+	"github.com/danielmoisa/matiq/internal/config"
 )
 
 var table = ""

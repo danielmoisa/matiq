@@ -280,7 +280,7 @@ const docTemplate = `{
         }
     },
     "definitions": {
-        "github_com_danielmoisa_auto-runner_internal_driver_keycloak.TokenInfo": {
+        "github_com_danielmoisa_matiq_internal_driver_keycloak.TokenInfo": {
             "type": "object",
             "properties": {
                 "claims": {
@@ -467,7 +467,7 @@ const docTemplate = `{
             "type": "object",
             "properties": {
                 "data": {
-                    "$ref": "#/definitions/github_com_danielmoisa_auto-runner_internal_driver_keycloak.TokenInfo"
+                    "$ref": "#/definitions/github_com_danielmoisa_matiq_internal_driver_keycloak.TokenInfo"
                 },
                 "message": {
                     "type": "string"

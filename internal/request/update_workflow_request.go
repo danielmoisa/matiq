@@ -3,8 +3,8 @@ package request
 import (
 	"encoding/json"
 
-	"github.com/danielmoisa/auto-runner/internal/utils/idconvertor"
-	"github.com/danielmoisa/auto-runner/internal/utils/resourcelist"
+	"github.com/danielmoisa/matiq/internal/utils/idconvertor"
+	"github.com/danielmoisa/matiq/internal/utils/resourcelist"
 )
 
 // The update action HTTP request body like:

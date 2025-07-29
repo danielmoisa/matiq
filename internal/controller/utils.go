@@ -6,8 +6,8 @@ import (
 	"net/http"
 	"strconv"
 
-	"github.com/danielmoisa/auto-runner/internal/response"
-	"github.com/danielmoisa/auto-runner/internal/utils/idconvertor"
+	"github.com/danielmoisa/matiq/internal/response"
+	"github.com/danielmoisa/matiq/internal/utils/idconvertor"
 	"github.com/gin-gonic/gin"
 )
 

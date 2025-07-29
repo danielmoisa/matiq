@@ -1,4 +1,4 @@
-module github.com/danielmoisa/auto-runner
+module github.com/danielmoisa/matiq
 
 go 1.23.5
 

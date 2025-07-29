@@ -1,11 +1,11 @@
 package controller
 
 import (
-	"github.com/danielmoisa/auto-runner/internal/driver/keycloak"
-	"github.com/danielmoisa/auto-runner/internal/repository"
-	"github.com/danielmoisa/auto-runner/internal/utils/cache"
-	"github.com/danielmoisa/auto-runner/internal/utils/drive"
-	"github.com/danielmoisa/auto-runner/internal/utils/tokenvalidator"
+	"github.com/danielmoisa/matiq/internal/driver/keycloak"
+	"github.com/danielmoisa/matiq/internal/repository"
+	"github.com/danielmoisa/matiq/internal/utils/cache"
+	"github.com/danielmoisa/matiq/internal/utils/drive"
+	"github.com/danielmoisa/matiq/internal/utils/tokenvalidator"
 )
 
 type Controller struct {

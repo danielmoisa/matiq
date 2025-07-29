@@ -3,7 +3,7 @@
 all: build
 
 run:
-	go run ./cmd/auto-runner/main.go
+	go run ./cmd/matiq/main.go
 
 run-web:
 	cd web && npm run dev
@@ -11,16 +11,16 @@ run-web:
 build: build-http-server build-websocket-server build-http-server-internal
 
 build-http-server:
-	go build -o bin/auto-runner src/cmd/auto-runner/main.go
+	go build -o bin/matiq src/cmd/matiq/main.go
 
 build-websocket-server:
-	go build -o bin/auto-runner-websocket src/cmd/auto-runner-websocket/main.go
+	go build -o bin/matiq-websocket src/cmd/matiq-websocket/main.go
 
 docker-compose:
 	docker-compose up -d
 
 swagger:
-	swag init --parseDependency --parseInternal -g ./cmd/auto-runner/main.go -o docs
+	swag init --parseDependency --parseInternal -g ./cmd/matiq/main.go -o docs
 
 
 test:

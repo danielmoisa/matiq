@@ -4,8 +4,8 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/danielmoisa/auto-runner/internal/config"
-	"github.com/danielmoisa/auto-runner/internal/model"
+	"github.com/danielmoisa/matiq/internal/config"
+	"github.com/danielmoisa/matiq/internal/model"
 	"go.uber.org/zap"
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"

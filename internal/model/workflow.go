@@ -4,9 +4,9 @@ import (
 	"encoding/json"
 	"time"
 
-	"github.com/danielmoisa/auto-runner/internal/request"
-	"github.com/danielmoisa/auto-runner/internal/utils/idconvertor"
-	"github.com/danielmoisa/auto-runner/internal/utils/resourcelist"
+	"github.com/danielmoisa/matiq/internal/request"
+	"github.com/danielmoisa/matiq/internal/utils/idconvertor"
+	"github.com/danielmoisa/matiq/internal/utils/resourcelist"
 	"github.com/google/uuid"
 )
 

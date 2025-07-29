@@ -1,7 +1,7 @@
 package router
 
 import (
-	"github.com/danielmoisa/auto-runner/internal/controller"
+	"github.com/danielmoisa/matiq/internal/controller"
 	"github.com/gin-gonic/gin"
 )
 

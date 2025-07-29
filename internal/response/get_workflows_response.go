@@ -1,6 +1,6 @@
 package response
 
-import "github.com/danielmoisa/auto-runner/internal/model"
+import "github.com/danielmoisa/matiq/internal/model"
 
 type GetWorkflowsResponse struct {
 	Workflows []*GetWorkflowResponse `json:"workflows"`

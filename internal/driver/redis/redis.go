@@ -1,7 +1,7 @@
 package redis
 
 import (
-	"github.com/danielmoisa/auto-runner/internal/config"
+	"github.com/danielmoisa/matiq/internal/config"
 	redis "github.com/redis/go-redis/v9"
 	"go.uber.org/zap"
 )
