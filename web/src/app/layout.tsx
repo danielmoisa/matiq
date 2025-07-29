@@ -14,7 +14,7 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Auto Runner - Automation Tool",
+  title: "Matiq - Automation Tool",
   description: "Connect and automate databases, APIs, and services without code",
 };
 

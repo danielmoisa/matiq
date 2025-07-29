@@ -107,7 +107,7 @@ func initServer() (*Server, error) {
 }
 
 func (server *Server) Start() {
-	server.logger.Infow("Starting auto runner server...")
+	server.logger.Infow("Starting matiq server...")
 
 	// init
 	gin.SetMode(server.config.ServerMode)
@@ -130,7 +130,7 @@ func (server *Server) Start() {
 	}
 }
 
-// @title Auto Runner Automation API
+// @title Matiq Automation API
 // @version 1.0
 // @description API for managing automation workflows and tasks.
 // @termsOfService http://swagger.io/terms/

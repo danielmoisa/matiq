@@ -1,4 +1,4 @@
-# Auto Runner App
+# Matiq App
 
 A modern workflow automation platform that allows users to design, build, and manage automated workflows through a visual interface. Similar to n8n, this platform enables seamless integration between different services and APIs with robust authentication and authorization.
 
