@@ -12,9 +12,6 @@ import (
 type CreateWorkflowResponse struct {
 	FlowActionID      string                 `json:"flowActionID"`
 	UID               uuid.UUID              `json:"uid"`
-	TeamID            string                 `json:"teamID"`
-	WorkflowID        string                 `json:"workflowID"`
-	Version           int                    `json:"version"`
 	ResourceID        string                 `json:"resourceID,omitempty"`
 	DisplayName       string                 `json:"displayName"`
 	ActionType        string                 `json:"flowActionType"`
@@ -32,14 +29,11 @@ type CreateWorkflowResponse struct {
 func NewCreateWorkflowResponse(workflow *model.Workflow) *CreateWorkflowResponse {
 	// flowActionConfig := workflow.ExportConfig()
 	resp := &CreateWorkflowResponse{
-		FlowActionID: idconvertor.ConvertIntToString(workflow.ID),
-		UID:          workflow.UID,
-		TeamID:       idconvertor.ConvertIntToString(workflow.TeamID),
-		WorkflowID:   idconvertor.ConvertIntToString(workflow.WorkflowID),
-		Version:      workflow.Version,
-		ResourceID:   idconvertor.ConvertIntToString(workflow.ResourceID),
-		DisplayName:  workflow.Name,
-		ActionType:   resourcelist.GetResourceIDMappedType(workflow.Type),
+		// FlowActionID: idconvertor.ConvertIntToString(workflow.UID),
+		UID:         workflow.UID,
+		ResourceID:  idconvertor.ConvertIntToString(workflow.ResourceID),
+		DisplayName: workflow.Name,
+		ActionType:  resourcelist.GetResourceIDMappedType(workflow.Type),
 		// IsVirtualResource: flowActionConfig.IsVirtualResource,
 		Content:     workflow.ExportTemplateInMap(),
 		Transformer: workflow.ExportTransformerInMap(),

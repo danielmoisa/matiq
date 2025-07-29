@@ -15,11 +15,7 @@ const (
 )
 
 type Workflow struct {
-	ID          int                    `gorm:"column:id;type:uint;primary_key"`
 	UID         uuid.UUID              `gorm:"column:uid;type:uuid;not null"`
-	TeamID      int                    `gorm:"column:team_id;type:uint"` // TODO: remove and replace with userID
-	WorkflowID  int                    `gorm:"column:workflow_id;type:bigint;not null"`
-	Version     int                    `gorm:"column:version;type:bigint;not null"`
 	ResourceID  int                    `gorm:"column:resource_id;type:bigint;not null"`
 	Name        string                 `gorm:"column:name;type:varchar;size:255;not null"`
 	Type        int                    `gorm:"column:type;type:smallint;not null"`
@@ -39,11 +35,8 @@ func NewWorkflow() *Workflow {
 	return &Workflow{}
 }
 
-func NewWorkflowByCreateRequest(teamID int, workflowID int, userID string, req *request.CreateWorkflowRequest) (*Workflow, error) {
+func NewWorkflowByCreateRequest(userID string, req *request.CreateWorkflowRequest) (*Workflow, error) {
 	action := &Workflow{
-		TeamID:     teamID,
-		WorkflowID: workflowID,
-		// Version:     APP_EDIT_VERSION, // new action always created in builder edit mode, and it is edit version.
 		ResourceID:  idconvertor.ConvertStringToInt(req.ResourceID),
 		Name:        req.DisplayName,
 		Type:        resourcelist.GetResourceNameMappedID(req.WorkflowType),
@@ -60,11 +53,8 @@ func NewWorkflowByCreateRequest(teamID int, workflowID int, userID string, req *
 	return action, nil
 }
 
-func NewWorkflowByUpdateRequest(teamID int, workflowID int, userID string, req *request.UpdateWorkflowRequest) (*Workflow, error) {
+func NewWorkflowByUpdateRequest(userID string, req *request.UpdateWorkflowRequest) (*Workflow, error) {
 	action := &Workflow{
-		TeamID:     teamID,
-		WorkflowID: workflowID,
-		// Version:     APP_EDIT_VERSION, // new action always created in builder edit mode, and it is edit version.
 		ResourceID:  idconvertor.ConvertStringToInt(req.ResourceID),
 		Name:        req.DisplayName,
 		Type:        resourcelist.GetResourceNameMappedID(req.WorkflowType),
@@ -81,11 +71,8 @@ func NewWorkflowByUpdateRequest(teamID int, workflowID int, userID string, req *
 	return action, nil
 }
 
-func NewWorkflowByRunRequest(teamID int, workflowID int, userID string, req *request.RunWorkflowRequest) *Workflow {
+func NewWorkflowByRunRequest(userID string, req *request.RunWorkflowRequest) *Workflow {
 	action := &Workflow{
-		TeamID:     teamID,
-		WorkflowID: workflowID,
-		// Version:     APP_EDIT_VERSION, // new action always created in builder edit mode, and it is edit version.
 		ResourceID:  idconvertor.ConvertStringToInt(req.ResourceID),
 		Name:        req.DisplayName,
 		Type:        resourcelist.GetResourceNameMappedID(req.WorkflowType),
@@ -100,10 +87,6 @@ func NewWorkflowByRunRequest(teamID int, workflowID int, userID string, req *req
 	return action
 }
 
-func (action *Workflow) CleanID() {
-	action.ID = 0
-}
-
 func (action *Workflow) InitUID() {
 	action.UID = uuid.New()
 }
@@ -116,13 +99,9 @@ func (action *Workflow) InitUpdatedAt() {
 	action.UpdatedAt = time.Now().UTC()
 }
 
-func (action *Workflow) InitForFork(teamID int, workflowID int, version int, userID string) {
-	action.TeamID = teamID
-	action.WorkflowID = workflowID
-	action.Version = version
+func (action *Workflow) InitForFork(version int, userID string) {
 	action.CreatedBy = userID
 	action.UpdatedBy = userID
-	action.CleanID()
 	action.InitUID()
 	action.InitCreatedAt()
 	action.InitUpdatedAt()
@@ -131,16 +110,6 @@ func (action *Workflow) InitForFork(teamID int, workflowID int, version int, use
 func (action *Workflow) SetTemplate(tempalte interface{}) {
 	templateInJSONByte, _ := json.Marshal(tempalte)
 	action.Template = string(templateInJSONByte)
-}
-
-func (action *Workflow) AppendNewVersion(newVersion int) {
-	action.CleanID()
-	action.InitUID()
-	action.Version = newVersion
-}
-
-func (action *Workflow) ExportID() int {
-	return action.ID
 }
 
 func (action *Workflow) ExportType() int {
@@ -257,7 +226,6 @@ func (action *Workflow) ExportTemplateInMap() map[string]interface{} {
 	// add resourceID, runByAnonymous, teamID field for extend action runtime info
 	payload["resourceID"] = action.ResourceID
 	payload["runByAnonymous"] = true
-	payload["teamID"] = action.TeamID
 	return payload
 }
 

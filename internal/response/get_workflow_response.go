@@ -10,11 +10,7 @@ import (
 )
 
 type GetWorkflowResponse struct {
-	ID                string                 `json:"workflowID"`
 	UID               uuid.UUID              `json:"uid"`
-	TeamID            string                 `json:"teamID"`
-	Version           int                    `json:"version"`
-	WorkflowID        string                 `json:"workflowID"`
 	ResourceID        string                 `json:"resourceID,omitempty"`
 	DisplayName       string                 `json:"displayName"`
 	WorkflowType      string                 `json:"workflowType"`
@@ -33,11 +29,7 @@ type GetWorkflowResponse struct {
 func NewGetWorkflowResponse(workflow *model.Workflow) *GetWorkflowResponse {
 	// workflowConfig := workflow.ExportConfig()
 	resp := &GetWorkflowResponse{
-		ID:           idconvertor.ConvertIntToString(workflow.ID),
 		UID:          workflow.UID,
-		TeamID:       idconvertor.ConvertIntToString(workflow.TeamID),
-		WorkflowID:   idconvertor.ConvertIntToString(workflow.ID),
-		Version:      workflow.Version,
 		ResourceID:   idconvertor.ConvertIntToString(workflow.ResourceID),
 		DisplayName:  workflow.Name,
 		WorkflowType: resourcelist.GetResourceIDMappedType(workflow.Type),

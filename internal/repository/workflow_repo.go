@@ -22,11 +22,11 @@ func NewWorkflowRepository(logger *zap.SugaredLogger, db *gorm.DB) *WorkflowRepo
 	}
 }
 
-func (impl *WorkflowRepository) Create(action *model.Workflow) (int, error) {
+func (impl *WorkflowRepository) Create(action *model.Workflow) (uuid.UUID, error) {
 	if err := impl.db.Create(action).Error; err != nil {
-		return 0, err
+		return uuid.Nil, err
 	}
-	return action.ID, nil
+	return action.UID, nil
 }
 
 func (impl *WorkflowRepository) Delete(teamID int, workflowID int) error {
@@ -37,7 +37,7 @@ func (impl *WorkflowRepository) Delete(teamID int, workflowID int) error {
 }
 
 func (impl *WorkflowRepository) UpdateWholeFlowAction(action *model.Workflow) error {
-	if err := impl.db.Model(action).Where("id = ?", action.ID).UpdateColumns(action).Error; err != nil {
+	if err := impl.db.Model(action).Where("uid = ?", action.UID).UpdateColumns(action).Error; err != nil {
 		return err
 	}
 	return nil

@@ -54,9 +54,6 @@ func seedWorkflows(db *gorm.DB) error {
 	sql := `
 	INSERT INTO workflows (
 		uid,
-		team_id,
-		workflow_id,
-		version,
 		resource_id,
 		name,
 		type,
@@ -71,9 +68,6 @@ func seedWorkflows(db *gorm.DB) error {
 	) VALUES (
 		gen_random_uuid(),
 		1,
-		1001,
-		0,
-		1,
 		'User Validation Workflow',
 		6,
 		'manually',
@@ -81,9 +75,9 @@ func seedWorkflows(db *gorm.DB) error {
 		?::jsonb,
 		?::jsonb,
 		NOW(),
-		'admin',
+		'752a914b-ba4d-4e6d-8827-343808995fc6',
 		NOW(),
-		'admin'
+		'752a914b-ba4d-4e6d-8827-343808995fc6'
 	)`
 
 	// Define the JSON objects as Go strings
