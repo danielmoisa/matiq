@@ -26,16 +26,16 @@ type Workflow struct {
 	Context     map[string]interface{} `gorm:"-" sql:"-"`
 	Config      string                 `gorm:"column:config;type:jsonb"`
 	CreatedAt   time.Time              `gorm:"column:created_at;type:timestamp;not null"`
-	CreatedBy   string                 `gorm:"column:created_by;type:varchar;size:255;not null"` // TODO: Refactor to uuid
+	CreatedBy   uuid.UUID              `gorm:"column:created_by;type:uuid;not null"`
 	UpdatedAt   time.Time              `gorm:"column:updated_at;type:timestamp;not null"`
-	UpdatedBy   string                 `gorm:"column:updated_by;type:varchar;size:255;not null"`
+	UpdatedBy   uuid.UUID              `gorm:"column:updated_by;type:uuid;not null"`
 }
 
 func NewWorkflow() *Workflow {
 	return &Workflow{}
 }
 
-func NewWorkflowByCreateRequest(userID string, req *request.CreateWorkflowRequest) (*Workflow, error) {
+func NewWorkflowByCreateRequest(userID uuid.UUID, req *request.CreateWorkflowRequest) (*Workflow, error) {
 	action := &Workflow{
 		ResourceID:  idconvertor.ConvertStringToInt(req.ResourceID),
 		Name:        req.DisplayName,
@@ -53,7 +53,7 @@ func NewWorkflowByCreateRequest(userID string, req *request.CreateWorkflowReques
 	return action, nil
 }
 
-func NewWorkflowByUpdateRequest(userID string, req *request.UpdateWorkflowRequest) (*Workflow, error) {
+func NewWorkflowByUpdateRequest(userID uuid.UUID, req *request.UpdateWorkflowRequest) (*Workflow, error) {
 	action := &Workflow{
 		ResourceID:  idconvertor.ConvertStringToInt(req.ResourceID),
 		Name:        req.DisplayName,
@@ -71,7 +71,7 @@ func NewWorkflowByUpdateRequest(userID string, req *request.UpdateWorkflowReques
 	return action, nil
 }
 
-func NewWorkflowByRunRequest(userID string, req *request.RunWorkflowRequest) *Workflow {
+func NewWorkflowByRunRequest(userID uuid.UUID, req *request.RunWorkflowRequest) *Workflow {
 	action := &Workflow{
 		ResourceID:  idconvertor.ConvertStringToInt(req.ResourceID),
 		Name:        req.DisplayName,
@@ -99,7 +99,7 @@ func (action *Workflow) InitUpdatedAt() {
 	action.UpdatedAt = time.Now().UTC()
 }
 
-func (action *Workflow) InitForFork(version int, userID string) {
+func (action *Workflow) InitForFork(userID uuid.UUID) {
 	action.CreatedBy = userID
 	action.UpdatedBy = userID
 	action.InitUID()
@@ -107,8 +107,8 @@ func (action *Workflow) InitForFork(version int, userID string) {
 	action.InitUpdatedAt()
 }
 
-func (action *Workflow) SetTemplate(tempalte interface{}) {
-	templateInJSONByte, _ := json.Marshal(tempalte)
+func (action *Workflow) SetTemplate(template interface{}) {
+	templateInJSONByte, _ := json.Marshal(template)
 	action.Template = string(templateInJSONByte)
 }
 

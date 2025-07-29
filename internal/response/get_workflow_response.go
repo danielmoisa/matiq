@@ -21,9 +21,9 @@ type GetWorkflowResponse struct {
 	Template          map[string]interface{} `json:"template"`
 	Config            map[string]interface{} `json:"config"`
 	CreatedAt         time.Time              `json:"createdAt,omitempty"`
-	CreatedBy         string                 `json:"createdBy,omitempty"`
+	CreatedBy         uuid.UUID              `json:"createdBy,omitempty"`
 	UpdatedAt         time.Time              `json:"updatedAt,omitempty"`
-	UpdatedBy         string                 `json:"updatedBy,omitempty"`
+	UpdatedBy         uuid.UUID              `json:"updatedBy,omitempty"`
 }
 
 func NewGetWorkflowResponse(workflow *model.Workflow) *GetWorkflowResponse {

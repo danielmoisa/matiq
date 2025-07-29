@@ -237,6 +237,13 @@ func (controller *Controller) GetWorkflow(c *gin.Context) {
 		return
 	}
 
+	// Parse user ID to UUID
+	parsedUserID, errInParse := uuid.Parse(userID)
+	if errInParse != nil {
+		controller.FeedbackBadRequest(c, ERROR_FLAG_VALIDATE_REQUEST_PARAM_FAILED, "invalid user ID format: "+errInParse.Error())
+		return
+	}
+
 	// fetch data
 	workflow, errInGetAction := controller.Repository.WorkflowRepository.RetrieveWorkflowByID(parsedWorkflowID)
 	if errInGetAction != nil {
@@ -245,7 +252,7 @@ func (controller *Controller) GetWorkflow(c *gin.Context) {
 	}
 
 	// Check if the workflow was created by the current user
-	if workflow.CreatedBy != userID {
+	if workflow.CreatedBy != parsedUserID {
 		controller.FeedbackBadRequest(c, ERROR_FLAG_ACCESS_DENIED, "you can only access workflows that you created")
 		return
 	}
