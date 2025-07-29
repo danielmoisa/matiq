@@ -22,7 +22,6 @@ docker-compose:
 swagger:
 	swag init --parseDependency --parseInternal -g ./cmd/matiq/main.go -o docs
 
-
 test:
 	PROJECT_PWD=$(shell pwd) go test -race ./...
 

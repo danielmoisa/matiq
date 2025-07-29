@@ -497,7 +497,7 @@ var SwaggerInfo = &swag.Spec{
 	Host:             "localhost:8001",
 	BasePath:         "/api/v1",
 	Schemes:          []string{"http", "https"},
-	Title:            "Auto Runner Automation API",
+	Title:            "Matiq Automation API",
 	Description:      "API for managing automation workflows and tasks.",
 	InfoInstanceName: "swagger",
 	SwaggerTemplate:  docTemplate,

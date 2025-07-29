@@ -6,7 +6,7 @@
     "swagger": "2.0",
     "info": {
         "description": "API for managing automation workflows and tasks.",
-        "title": "Auto Runner Automation API",
+        "title": "Matiq Automation API",
         "termsOfService": "http://swagger.io/terms/",
         "contact": {
             "name": "API Support",
