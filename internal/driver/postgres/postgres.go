@@ -14,11 +14,11 @@ import (
 const RETRY_TIMES = 6
 
 type PostgresConfig struct {
-	Addr     string `env:"WF_PG_ADDR" envDefault:"localhost"`
-	Port     string `env:"WF_PG_PORT" envDefault:"5433"`
-	User     string `env:"WF_PG_USER" envDefault:"wf_cloud"`
-	Password string `env:"WF_PG_PASSWORD" envDefault:"wf2025"`
-	Database string `env:"WF_PG_DATABASE" envDefault:"wf_cloud"`
+	Addr     string `env:"MATIQ_PG_ADDR"`
+	Port     string `env:"MATIQ_PG_PORT"`
+	User     string `env:"MATIQ_PG_USER"`
+	Password string `env:"MATIQ_PG_PASSWORD"`
+	Database string `env:"MATIQ_PG_DATABASE"`
 }
 
 func NewPostgresConnectionByGlobalConfig(config *config.Config, logger *zap.SugaredLogger) (*gorm.DB, error) {
@@ -37,8 +37,10 @@ func NewPostgresConnection(config *PostgresConfig, logger *zap.SugaredLogger) (*
 	var err error
 	retries := RETRY_TIMES
 
+	fmt.Println(config)
+
 	db, err = gorm.Open(postgres.New(postgres.Config{
-		DSN: fmt.Sprintf("host='%s' user='%s' password='%s' dbname='%s' port='%s'",
+		DSN: fmt.Sprintf("host='%s' user='%s' password='%s' dbname='%s' port='%s' sslmode=disable",
 			config.Addr, config.User, config.Password, config.Database, config.Port),
 		PreferSimpleProtocol: true, // disables implicit prepared statement usage
 	}), &gorm.Config{})
@@ -51,7 +53,7 @@ func NewPostgresConnection(config *PostgresConfig, logger *zap.SugaredLogger) (*
 			retries--
 			time.Sleep(10 * time.Second)
 			db, err = gorm.Open(postgres.New(postgres.Config{
-				DSN: fmt.Sprintf("host='%s' user='%s' password='%s' dbname='%s' port='%s'",
+				DSN: fmt.Sprintf("host='%s' user='%s' password='%s' dbname='%s' port='%s' sslmode=disable",
 					config.Addr, config.User, config.Password, config.Database, config.Port),
 				PreferSimpleProtocol: true, // disables implicit prepared statement usage
 			}), &gorm.Config{})

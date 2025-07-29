@@ -9,10 +9,10 @@ import (
 const RETRY_TIMES = 6
 
 type RedisConfig struct {
-	Addr     string `env:"WF_REDIS_ADDR" envDefault:"localhost"`
-	Port     string `env:"WF_REDIS_PORT" envDefault:"6379"`
-	Password string `env:"WF_REDIS_PASSWORD" envDefault:"wf2025"`
-	Database int    `env:"WF_REDIS_DATABASE" envDefault:"0"`
+	Addr     string `env:"WF_REDIS_ADDR"`
+	Port     string `env:"WF_REDIS_PORT"`
+	Password string `env:"WF_REDIS_PASSWORD"`
+	Database int    `env:"WF_REDIS_DATABASE"`
 }
 
 func NewRedisConnectionByGlobalConfig(config *config.Config, logger *zap.SugaredLogger) (*redis.Client, error) {

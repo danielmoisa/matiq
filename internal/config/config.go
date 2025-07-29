@@ -1,7 +1,10 @@
 package config
 
 import (
+	"bufio"
 	"fmt"
+	"os"
+	"strings"
 	"sync"
 	"time"
 
@@ -37,80 +40,83 @@ func GetInstance() *Config {
 
 type Config struct {
 	// server config
-	ServerHost         string `env:"MATIQ_SERVER_HOST" envDefault:"0.0.0.0"`
-	ServerPort         string `env:"MATIQ_SERVER_PORT" envDefault:"8080"`
-	InternalServerPort string `env:"MATIQ_SERVER_INTERNAL_PORT" envDefault:"9005"`
-	ServerMode         string `env:"MATIQ_SERVER_MODE" envDefault:"debug"`
-	DeployMode         string `env:"MATIQ_DEPLOY_MODE" envDefault:"self-host"`
-	SecretKey          string `env:"MATIQ_SECRET_KEY" envDefault:"8xEMrWkBARcDDYQ"`
+	ServerHost         string `env:"MATIQ_SERVER_HOST"`
+	ServerPort         string `env:"MATIQ_SERVER_PORT"`
+	InternalServerPort string `env:"MATIQ_SERVER_INTERNAL_PORT"`
+	ServerMode         string `env:"MATIQ_SERVER_MODE"`
+	DeployMode         string `env:"MATIQ_DEPLOY_MODE"`
+	SecretKey          string `env:"MATIQ_SECRET_KEY"`
 
 	// websocket config
-	WebsocketServerHost                       string `env:"MATIQ_WEBSOCKET_SERVER_HOST" envDefault:"0.0.0.0"`
-	WebsocketServerPort                       string `env:"MATIQ_WEBSOCKET_SERVER_PORT" envDefault:"8002"`
-	WebsocketServerConnectionHost             string `env:"MATIQ_WEBSOCKET_CONNECTION_HOST" envDefault:"0.0.0.0"`
-	WebsocketServerConnectionPort             string `env:"MATIQ_WEBSOCKET_CONNECTION_PORT" envDefault:"80"`
-	WebsocketServerConnectionHostSouthAsia    string `env:"MATIQ_WEBSOCKET_CONNECTION_HOST_SOUTH_ASIA" envDefault:"0.0.0.0"`
-	WebsocketServerConnectionPortSouthAsia    string `env:"MATIQ_WEBSOCKET_CONNECTION_PORT_SOUTH_ASIA" envDefault:"80"`
-	WebsocketServerConnectionHostEastAsia     string `env:"MATIQ_WEBSOCKET_CONNECTION_HOST_EAST_ASIA" envDefault:"0.0.0.0"`
-	WebsocketServerConnectionPortEastAsia     string `env:"MATIQ_WEBSOCKET_CONNECTION_PORT_EAST_ASIA" envDefault:"80"`
-	WebsocketServerConnectionHostCenterEurope string `env:"MATIQ_WEBSOCKET_CONNECTION_HOST_CENTER_EUROPE" envDefault:"0.0.0.0"`
-	WebsocketServerConnectionPortCenterEurope string `env:"MATIQ_WEBSOCKET_CONNECTION_PORT_CENTER_EUROPE" envDefault:"80"`
-	WSSEnabled                                string `env:"MATIQ_WSS_ENABLED" envDefault:"false"`
+	WebsocketServerHost                       string `env:"MATIQ_WEBSOCKET_SERVER_HOST"`
+	WebsocketServerPort                       string `env:"MATIQ_WEBSOCKET_SERVER_PORT"`
+	WebsocketServerConnectionHost             string `env:"MATIQ_WEBSOCKET_CONNECTION_HOST"`
+	WebsocketServerConnectionPort             string `env:"MATIQ_WEBSOCKET_CONNECTION_PORT"`
+	WebsocketServerConnectionHostSouthAsia    string `env:"MATIQ_WEBSOCKET_CONNECTION_HOST_SOUTH_ASIA"`
+	WebsocketServerConnectionPortSouthAsia    string `env:"MATIQ_WEBSOCKET_CONNECTION_PORT_SOUTH_ASIA"`
+	WebsocketServerConnectionHostEastAsia     string `env:"MATIQ_WEBSOCKET_CONNECTION_HOST_EAST_ASIA"`
+	WebsocketServerConnectionPortEastAsia     string `env:"MATIQ_WEBSOCKET_CONNECTION_PORT_EAST_ASIA"`
+	WebsocketServerConnectionHostCenterEurope string `env:"MATIQ_WEBSOCKET_CONNECTION_HOST_CENTER_EUROPE"`
+	WebsocketServerConnectionPortCenterEurope string `env:"MATIQ_WEBSOCKET_CONNECTION_PORT_CENTER_EUROPE"`
+	WSSEnabled                                string `env:"MATIQ_WSS_ENABLED"`
 
 	// key for idconvertor
-	RandomKey string `env:"MATIQ_RANDOM_KEY"  envDefault:"abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789"`
+	RandomKey string `env:"MATIQ_RANDOM_KEY"`
 	// storage config
-	PostgresAddr     string `env:"MATIQ_PG_ADDR" envDefault:"localhost"`
-	PostgresPort     string `env:"MATIQ_PG_PORT" envDefault:"5435"`
-	PostgresUser     string `env:"MATIQ_PG_USER" envDefault:"workflow"`
-	PostgresPassword string `env:"MATIQ_PG_PASSWORD" envDefault:"workflow2025"`
-	PostgresDatabase string `env:"MATIQ_PG_DATABASE" envDefault:"workflow"`
+	PostgresAddr     string `env:"MATIQ_PG_ADDR"`
+	PostgresPort     string `env:"MATIQ_PG_PORT"`
+	PostgresUser     string `env:"MATIQ_PG_USER"`
+	PostgresPassword string `env:"MATIQ_PG_PASSWORD"`
+	PostgresDatabase string `env:"MATIQ_PG_DATABASE"`
 	// cache config
-	RedisAddr     string `env:"MATIQ_REDIS_ADDR" envDefault:"localhost"`
-	RedisPort     string `env:"MATIQ_REDIS_PORT" envDefault:"6375"`
-	RedisPassword string `env:"MATIQ_REDIS_PASSWORD" envDefault:"wf2025"`
-	RedisDatabase int    `env:"MATIQ_REDIS_DATABASE" envDefault:"0"`
+	RedisAddr     string `env:"MATIQ_REDIS_ADDR"`
+	RedisPort     string `env:"MATIQ_REDIS_PORT"`
+	RedisPassword string `env:"MATIQ_REDIS_PASSWORD"`
+	RedisDatabase int    `env:"MATIQ_REDIS_DATABASE"`
 	// drive config
-	DriveType             string `env:"MATIQ_DRIVE_TYPE" envDefault:""`
-	DriveAccessKeyID      string `env:"MATIQ_DRIVE_ACCESS_KEY_ID" envDefault:""`
-	DriveAccessKeySecret  string `env:"MATIQ_DRIVE_ACCESS_KEY_SECRET" envDefault:""`
-	DriveRegion           string `env:"MATIQ_DRIVE_REGION" envDefault:""`
-	DriveEndpoint         string `env:"MATIQ_DRIVE_ENDPOINT" envDefault:""`
-	DriveSystemBucketName string `env:"MATIQ_DRIVE_SYSTEM_BUCKET_NAME" envDefault:"wf-cloud"`
-	DriveTeamBucketName   string `env:"MATIQ_DRIVE_TEAM_BUCKET_NAME" envDefault:"wf-cloud-team"`
-	DriveUploadTimeoutRaw string `env:"MATIQ_DRIVE_UPLOAD_TIMEOUT" envDefault:"30s"`
+	DriveType             string `env:"MATIQ_DRIVE_TYPE"`
+	DriveAccessKeyID      string `env:"MATIQ_DRIVE_ACCESS_KEY_ID"`
+	DriveAccessKeySecret  string `env:"MATIQ_DRIVE_ACCESS_KEY_SECRET"`
+	DriveRegion           string `env:"MATIQ_DRIVE_REGION"`
+	DriveEndpoint         string `env:"MATIQ_DRIVE_ENDPOINT"`
+	DriveSystemBucketName string `env:"MATIQ_DRIVE_SYSTEM_BUCKET_NAME"`
+	DriveTeamBucketName   string `env:"MATIQ_DRIVE_TEAM_BUCKET_NAME"`
+	DriveUploadTimeoutRaw string `env:"MATIQ_DRIVE_UPLOAD_TIMEOUT"`
 	DriveUploadTimeout    time.Duration
 	// supervisor API
-	SupervisorInternalRestAPI string `env:"MATIQ_SUPERVISOR_INTERNAL_API" envDefault:"http://127.0.0.1:9001/api/v1"`
+	SupervisorInternalRestAPI string `env:"MATIQ_SUPERVISOR_INTERNAL_API"`
 
 	// peripheral API
-	PeripheralAPI string `env:"MATIQ_PERIPHERAL_API" envDefault:"https://peripheral-api.workflow-builder.com/v1/"`
+	PeripheralAPI string `env:"MATIQ_PERIPHERAL_API"`
 	// resource manager API
-	ResourceManagerRestAPI         string `env:"MATIQ_RESOURCE_MANAGER_API" envDefault:"http://workflow-builder-resource-manager-backend:8006"`
-	ResourceManagerInternalRestAPI string `env:"MATIQ_RESOURCE_MANAGER_INTERNAL_API" envDefault:"http://workflow-builder-resource-manager-backend-internal:9004"`
+	ResourceManagerRestAPI         string `env:"MATIQ_RESOURCE_MANAGER_API"`
+	ResourceManagerInternalRestAPI string `env:"MATIQ_RESOURCE_MANAGER_INTERNAL_API"`
 	// marketplace config
-	MarketplaceInternalRestAPI string `env:"MATIQ_MARKETPLACE_INTERNAL_API" envDefault:"http://workflow-builder-marketplace-backend-internal:9003/api/v1"`
+	MarketplaceInternalRestAPI string `env:"MATIQ_MARKETPLACE_INTERNAL_API"`
 	// token for internal api
-	ControlToken string `env:"MATIQ_CONTROL_TOKEN" envDefault:""`
+	ControlToken string `env:"MATIQ_CONTROL_TOKEN"`
 	// google config
-	GoogleSheetsClientID     string `env:"MATIQ_GS_CLIENT_ID" envDefault:""`
-	GoogleSheetsClientSecret string `env:"MATIQ_GS_CLIENT_SECRET" envDefault:""`
-	GoogleSheetsRedirectURI  string `env:"MATIQ_GS_REDIRECT_URI" envDefault:""`
+	GoogleSheetsClientID     string `env:"MATIQ_GS_CLIENT_ID"`
+	GoogleSheetsClientSecret string `env:"MATIQ_GS_CLIENT_SECRET"`
+	GoogleSheetsRedirectURI  string `env:"MATIQ_GS_REDIRECT_URI"`
 	// toke for ip zone detector
-	IPZoneDetectorToken string `env:"MATIQ_IP_ZONE_DETECTOR_TOKEN" envDefault:""`
+	IPZoneDetectorToken string `env:"MATIQ_IP_ZONE_DETECTOR_TOKEN"`
 	// drive config
-	DriveRestAPI string `env:"MATIQ_DRIVE_API" envDefault:"http://workflow-builder-drive-backend:8004"`
+	DriveRestAPI string `env:"MATIQ_DRIVE_API"`
 
 	// Keycloak config
-	KeycloakURL          string `env:"MATIQ_KEYCLOAK_URL" envDefault:"http://localhost:8888"`
-	KeycloakRealm        string `env:"MATIQ_KEYCLOAK_REALM" envDefault:"matiq"`
-	KeycloakClientID     string `env:"MATIQ_KEYCLOAK_CLIENT_ID" envDefault:"matiq"`
-	KeycloakClientSecret string `env:"MATIQ_KEYCLOAK_CLIENT_SECRET" envDefault:"qUlGcweKQETa2dPTIn8dH2i6ISBg0KF8"`
-	KeycloakAdminUser    string `env:"MATIQ_KEYCLOAK_ADMIN_USER" envDefault:"admin"`
-	KeycloakAdminPass    string `env:"MATIQ_KEYCLOAK_ADMIN_PASS" envDefault:"admin123"`
+	KeycloakURL          string `env:"MATIQ_KEYCLOAK_URL"`
+	KeycloakRealm        string `env:"MATIQ_KEYCLOAK_REALM"`
+	KeycloakClientID     string `env:"MATIQ_KEYCLOAK_CLIENT_ID"`
+	KeycloakClientSecret string `env:"MATIQ_KEYCLOAK_CLIENT_SECRET"`
+	KeycloakAdminUser    string `env:"MATIQ_KEYCLOAK_ADMIN_USER"`
+	KeycloakAdminPass    string `env:"MATIQ_KEYCLOAK_ADMIN_PASS"`
 }
 
 func getConfig() (*Config, error) {
+	// Load .env file first
+	loadEnvFile()
+
 	// fetch
 	cfg := &Config{}
 	err := env.Parse(cfg)
@@ -126,6 +132,38 @@ func getConfig() (*Config, error) {
 	fmt.Printf("parse config error info: %+v\n", err)
 
 	return cfg, err
+}
+
+// loadEnvFile loads environment variables from .env file
+func loadEnvFile() {
+	file, err := os.Open(".env")
+	if err != nil {
+		// .env file is optional, so we don't error if it doesn't exist
+		return
+	}
+	defer file.Close()
+
+	scanner := bufio.NewScanner(file)
+	for scanner.Scan() {
+		line := strings.TrimSpace(scanner.Text())
+
+		// Skip empty lines and comments
+		if line == "" || strings.HasPrefix(line, "#") {
+			continue
+		}
+
+		// Parse key=value
+		parts := strings.SplitN(line, "=", 2)
+		if len(parts) == 2 {
+			key := strings.TrimSpace(parts[0])
+			value := strings.TrimSpace(parts[1])
+
+			// Only set if not already set in environment
+			if os.Getenv(key) == "" {
+				os.Setenv(key, value)
+			}
+		}
+	}
 }
 
 func (c *Config) IsSelfHostMode() bool {

@@ -43,6 +43,7 @@ id_rsa.pub
 /web/*.tsbuildinfo
 /web/next-env.d.ts
 
+
 # testing
 /coverage
 
@@ -58,3 +59,7 @@ yarn-error.log*
 
 # vercel
 .vercel
+
+
+# env
+.env

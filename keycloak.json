@@ -19,16 +19,16 @@
   },
   "users": [
     {
-      "username": "admin",
+      "username": "user",
       "enabled": true,
       "emailVerified": true,
-      "email": "admin@matiq.com",
-      "firstName": "Admin",
-      "lastName": "User",
+      "email": "user@matiq.com",
+      "firstName": "User",
+      "lastName": "One",
       "credentials": [
         {
           "type": "password",
-          "value": "admin123",
+          "value": "user123",
           "temporary": false
         }
       ],
