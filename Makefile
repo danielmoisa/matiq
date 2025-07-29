@@ -8,13 +8,22 @@ run:
 run-web:
 	cd web && npm run dev
 
-build: build-http-server build-websocket-server build-http-server-internal
+seed:
+	go run ./cmd/seeder/main.go
+
+seed-workflows:
+	go run ./cmd/seeder/main.go -type=workflows
+
+build: build-http-server build-websocket-server build-http-server-internal build-seeder
 
 build-http-server:
 	go build -o bin/matiq src/cmd/matiq/main.go
 
 build-websocket-server:
 	go build -o bin/matiq-websocket src/cmd/matiq-websocket/main.go
+
+build-seeder:
+	go build -o bin/seeder ./cmd/seeder/main.go
 
 docker-compose:
 	docker-compose up -d

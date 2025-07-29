@@ -29,8 +29,9 @@ A modern workflow automation platform that allows users to design, build, and ma
 1. `make docker-compose`
 2. Import keycloak.json to create a new realm at `http://localhost:8888`.
 3. Configure environment variables for database and Keycloak.
-4. Run the Go backend: `make run`
-5. Create web/.env and add the variables from env.local.
-6. Start the Next.js frontend: `make run-web`
-7. Access the application at `http://localhost:3000`
-8. Access api swagger at `http://localhost:8080/swagger/index.html`
+4. Create .env and add the variables from env.local.
+5. Run `make seed`.
+6. Run the Go backend: `make run`
+7. Start the Next.js frontend: `make run-web`
+8. Access the application at `http://localhost:3000`
+9. Access api swagger at `http://localhost:8080/swagger/index.html`

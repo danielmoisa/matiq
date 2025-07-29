@@ -1,8 +1,6 @@
 package controller
 
 import (
-	"context"
-
 	"github.com/gin-gonic/gin"
 	"github.com/google/uuid"
 
@@ -232,30 +230,6 @@ func (controller *Controller) GetWorkflow(c *gin.Context) {
 		return
 	}
 
-	// validate user permission using Keycloak groups
-	ctx := context.Background()
-
-	// Check if user is in workflow-viewers or workflow-managers group
-	canView, errInCheckViewer := controller.KeycloakClient.CheckUserInGroup(ctx, userID, "workflow-viewers")
-	if errInCheckViewer != nil {
-		controller.FeedbackBadRequest(c, ERROR_FLAG_ACCESS_DENIED, "error checking viewer permission: "+errInCheckViewer.Error())
-		return
-	}
-
-	if !canView {
-		// If not in viewers group, check if user is in managers group
-		canManage, errInCheckManager := controller.KeycloakClient.CheckUserInGroup(ctx, userID, "workflow-managers")
-		if errInCheckManager != nil {
-			controller.FeedbackBadRequest(c, ERROR_FLAG_ACCESS_DENIED, "error checking manager permission: "+errInCheckManager.Error())
-			return
-		}
-
-		if !canManage {
-			controller.FeedbackBadRequest(c, ERROR_FLAG_ACCESS_DENIED, "you do not have permission to view workflows")
-			return
-		}
-	}
-
 	// Parse workflow ID string to UUID
 	parsedWorkflowID, errInParse := uuid.Parse(workflowIDParam)
 	if errInParse != nil {
@@ -267,6 +241,12 @@ func (controller *Controller) GetWorkflow(c *gin.Context) {
 	workflow, errInGetAction := controller.Repository.WorkflowRepository.RetrieveWorkflowByID(parsedWorkflowID)
 	if errInGetAction != nil {
 		controller.FeedbackBadRequest(c, ERROR_FLAG_CAN_NOT_GET_WORKFLOW, "get workflow error: "+errInGetAction.Error())
+		return
+	}
+
+	// Check if the workflow was created by the current user
+	if workflow.CreatedBy != userID {
+		controller.FeedbackBadRequest(c, ERROR_FLAG_ACCESS_DENIED, "you can only access workflows that you created")
 		return
 	}
 
@@ -300,31 +280,7 @@ func (controller *Controller) GetWorkflows(c *gin.Context) {
 		return
 	}
 
-	// validate user permission using Keycloak groups
-	ctx := context.Background()
-
-	// Check if user is in workflow-viewers or workflow-managers group
-	canView, errInCheckViewer := controller.KeycloakClient.CheckUserInGroup(ctx, userID, "workflow-viewers")
-	if errInCheckViewer != nil {
-		controller.FeedbackBadRequest(c, ERROR_FLAG_ACCESS_DENIED, "error checking viewer permission: "+errInCheckViewer.Error())
-		return
-	}
-
-	if !canView {
-		// If not in viewers group, check if user is in managers group
-		canManage, errInCheckManager := controller.KeycloakClient.CheckUserInGroup(ctx, userID, "workflow-managers")
-		if errInCheckManager != nil {
-			controller.FeedbackBadRequest(c, ERROR_FLAG_ACCESS_DENIED, "error checking manager permission: "+errInCheckManager.Error())
-			return
-		}
-
-		if !canManage {
-			controller.FeedbackBadRequest(c, ERROR_FLAG_ACCESS_DENIED, "you do not have permission to view workflows")
-			return
-		}
-	}
-
-	// fetch data
+	// fetch data - this method already filters workflows by user ID (created by user)
 	workflows, errInGetWorkflows := controller.Repository.WorkflowRepository.RetrieveAllWorkflowByUserID(userID)
 	if errInGetWorkflows != nil {
 		controller.FeedbackBadRequest(c, ERROR_FLAG_CAN_NOT_GET_WORKFLOW, "get workflows error: "+errInGetWorkflows.Error())
