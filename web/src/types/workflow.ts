@@ -62,7 +62,7 @@ export interface WorkflowBackend {
   displayName: string;          // Workflow name
   workflowType: string;         // Workflow type as string
   isVirtualResource: boolean;   // Virtual resource flag
-  content: {                    // Content containing nodes and connections
+  template: {                    // Template containing nodes and connections
     nodes?: WorkflowNode[];
     connections?: Connection[];
     resourceID?: number;
@@ -71,7 +71,6 @@ export interface WorkflowBackend {
   };
   transformer: unknown;         // Transformer data (can be null)
   triggerMode: string;          // Trigger mode as string
-  template: unknown;            // Template data (can be null)
   config: unknown;              // Config data (can be null)
   createdAt: string;            // ISO timestamp
   createdBy: string;            // Encoded user ID
@@ -99,8 +98,8 @@ export interface Workflow {
   workflowType?: string;
 }
 
-// Template structure stored in backend content field
-interface WorkflowContent {
+// Template structure stored in backend template field
+interface WorkflowTemplate {
   nodes?: WorkflowNode[];
   connections?: Connection[];
   resourceID?: number;
@@ -125,16 +124,16 @@ export function convertBackendToFrontend(backend: WorkflowBackend | null | undef
     };
   }
 
-  // Extract nodes and connections from content
+  // Extract nodes and connections from template
   let nodes: WorkflowNode[] = [];
   let connections: Connection[] = [];
-  
-  if (backend.content) {
-    nodes = backend.content.nodes || [];
-    connections = backend.content.connections || [];
+
+  if (backend.template) {
+    nodes = backend.template.nodes || [];
+    connections = backend.template.connections || [];
   }
 
-  // Determine status based on content and trigger mode
+  // Determine status based on template and trigger mode
   let status: "active" | "draft" | "paused" | "error" = "draft";
   if (nodes.length > 0) {
     status = "active";
@@ -169,12 +168,12 @@ export function convertFrontendToBackendRequest(
   displayName: string;
   workflowType: string;
   triggerMode: string;
-  content: WorkflowContent;
+  template: WorkflowTemplate;
   transformer?: unknown;
   config?: unknown;
 } {
-  // Create content object from nodes and connections
-  const content: WorkflowContent = {
+  // Create template object from nodes and connections
+  const template: WorkflowTemplate = {
     nodes,
     connections,
     runByAnonymous: true,
@@ -184,7 +183,7 @@ export function convertFrontendToBackendRequest(
     displayName: workflow.name || "Untitled Workflow",
     workflowType: workflow.workflowType || "restapi",
     triggerMode: workflow.triggerMode || "1", // Backend expects string
-    content,
+    template,
     transformer: null,
     config: null,
   };

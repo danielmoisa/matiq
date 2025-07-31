@@ -54,7 +54,6 @@ export default function WorkflowsPage() {
     }
   };
 
-  console.log({workflows})
 
   if (loading && workflows.length === 0) {
     return (
