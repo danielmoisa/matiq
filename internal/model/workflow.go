@@ -222,7 +222,10 @@ func (action *Workflow) ExportTransformerInMap() map[string]interface{} {
 
 func (action *Workflow) ExportTemplateInMap() map[string]interface{} {
 	payload := make(map[string]interface{}, 0)
-	json.Unmarshal([]byte(action.Template), &payload)
+
+	if action.Template != "" {
+		json.Unmarshal([]byte(action.Template), &payload)
+	}
 	// add resourceID, runByAnonymous, teamID field for extend action runtime info
 	payload["resourceID"] = action.ResourceID
 	payload["runByAnonymous"] = true
