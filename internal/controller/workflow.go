@@ -1,89 +1,82 @@
 package controller
 
 import (
+	"encoding/json"
+	"fmt"
+
 	"github.com/gin-gonic/gin"
 	"github.com/google/uuid"
 
+	"github.com/danielmoisa/matiq/internal/model"
+	"github.com/danielmoisa/matiq/internal/request"
 	"github.com/danielmoisa/matiq/internal/response"
 )
 
-// func (controller *Controller) CreateWorkflow(c *gin.Context) {
-// 	// fetch needed param
-// 	teamID, errInGetTeamID := controller.GetMagicIntParamFromRequest(c, PARAM_TEAM_ID)
-// 	workflowID, errInGetWORKFLOWID := controller.GetMagicIntParamFromRequest(c, PARAM_WORKFLOW_ID)
-// 	userID, errInGetUserID := controller.GetUserIDFromAuth(c)
-// 	// userAuthToken, errInGetAuthToken := controller.GetUserAuthTokenFromHeader(c)
-// 	if errInGetTeamID != nil || errInGetWORKFLOWID != nil || errInGetUserID != nil {
-// 		return
-// 	}
+func (controller *Controller) CreateWorkflow(c *gin.Context) {
+	// fetch needed param
+	userID, errInGetUserID := controller.GetUserIDFromKeycloakAuth(c)
+	if errInGetUserID != nil {
+		controller.FeedbackBadRequest(c, ERROR_FLAG_ACCESS_DENIED, "authentication required")
+		return
+	}
 
-// 	// validate
-// 	// canManage, errInCheckAttr := controller.AttributeGroup.CanManage(
-// 	// 	teamID,
-// 	// 	userAuthToken,
-// 	// 	accesscontrol.UNIT_TYPE_FLOW_ACTION,
-// 	// 	accesscontrol.DEFAULT_UNIT_ID,
-// 	// 	accesscontrol.ACTION_MANAGE_CREATE_FLOW_ACTION,
-// 	// )
-// 	// if errInCheckAttr != nil {
-// 	// 	controller.FeedbackBadRequest(c, ERROR_FLAG_ACCESS_DENIED, "error in check attribute: "+errInCheckAttr.Error())
-// 	// 	return
-// 	// }
-// 	// if !canManage {
-// 	// 	controller.FeedbackBadRequest(c, ERROR_FLAG_ACCESS_DENIED, "you can not access this attribute due to access control policy.")
-// 	// 	return
-// 	// }
+	// fetch payload
+	createWorkflowRequest := request.NewCreateWorkflowRequest()
+	if err := json.NewDecoder(c.Request.Body).Decode(&createWorkflowRequest); err != nil {
+		controller.FeedbackBadRequest(c, ERROR_FLAG_PARSE_REQUEST_BODY_FAILED, "parse request body error: "+err.Error())
+		return
+	}
+	fmt.Printf("createWorkflowRequest: %+v\n", createWorkflowRequest)
 
-// 	// fetch payload
-// 	createWorkflowRequest := request.NewCreateWorkflowRequest()
-// 	if err := json.NewDecoder(c.Request.Body).Decode(&createWorkflowRequest); err != nil {
-// 		controller.FeedbackBadRequest(c, ERROR_FLAG_PARSE_REQUEST_BODY_FAILED, "parse request body error: "+err.Error())
-// 		return
-// 	}
-// 	fmt.Printf("createWorkflowRequest: %+v\n", createWorkflowRequest)
+	// append remote virtual resource (like aiagent, but the transformet is local virtual resource)
+	// if createFlowActionRequest.IsRemoteVirtualAction() {
+	// 	// the AI_Agent need fetch resource info from resource manager, but illa drive does not need that
+	// 	if createFlowActionRequest.NeedFetchResourceInfoFromSourceManager() {
+	// 		api, errInNewAPI := illaresourcemanagersdk.NewIllaResourceManagerRestAPI()
+	// 		if errInNewAPI != nil {
+	// 			controller.FeedbackBadRequest(c, ERROR_FLAG_CAN_NOT_CREATE_FLOW_ACTION, "error in fetch flowAction mapped virtual resource: "+errInNewAPI.Error())
+	// 			return
+	// 		}
+	// 		virtualResource, errInGetVirtualResource := api.GetResource(createFlowActionRequest.ExportFlowActionTypeInInt(), createFlowActionRequest.ExportResourceIDInInt())
+	// 		if errInGetVirtualResource != nil {
+	// 			controller.FeedbackBadRequest(c, ERROR_FLAG_CAN_NOT_CREATE_FLOW_ACTION, "error in fetch flowAction mapped virtual resource: "+errInGetVirtualResource.Error())
+	// 			return
+	// 		}
+	// 		createFlowActionRequest.AppendVirtualResourceToTemplate(virtualResource)
+	// 	}
+	// }
 
-// 	// append remote virtual resource (like aiagent, but the transformet is local virtual resource)
-// 	// if createFlowActionRequest.IsRemoteVirtualAction() {
-// 	// 	// the AI_Agent need fetch resource info from resource manager, but illa drive does not need that
-// 	// 	if createFlowActionRequest.NeedFetchResourceInfoFromSourceManager() {
-// 	// 		api, errInNewAPI := illaresourcemanagersdk.NewIllaResourceManagerRestAPI()
-// 	// 		if errInNewAPI != nil {
-// 	// 			controller.FeedbackBadRequest(c, ERROR_FLAG_CAN_NOT_CREATE_FLOW_ACTION, "error in fetch flowAction mapped virtual resource: "+errInNewAPI.Error())
-// 	// 			return
-// 	// 		}
-// 	// 		virtualResource, errInGetVirtualResource := api.GetResource(createFlowActionRequest.ExportFlowActionTypeInInt(), createFlowActionRequest.ExportResourceIDInInt())
-// 	// 		if errInGetVirtualResource != nil {
-// 	// 			controller.FeedbackBadRequest(c, ERROR_FLAG_CAN_NOT_CREATE_FLOW_ACTION, "error in fetch flowAction mapped virtual resource: "+errInGetVirtualResource.Error())
-// 	// 			return
-// 	// 		}
-// 	// 		createFlowActionRequest.AppendVirtualResourceToTemplate(virtualResource)
-// 	// 	}
-// 	// }
+	// Parse user ID to UUID
+	parsedUserID, errInParse := uuid.Parse(userID)
+	if errInParse != nil {
+		controller.FeedbackBadRequest(c, ERROR_FLAG_VALIDATE_REQUEST_PARAM_FAILED, "invalid user ID format: "+errInParse.Error())
+		return
+	}
 
-// 	// init workflow instace
-// 	workflow, errorInNewWorkflow := model.NewWorkflowByCreateRequest(teamID, workflowID, userID, createWorkflowRequest)
-// 	if errorInNewWorkflow != nil {
-// 		controller.FeedbackBadRequest(c, ERROR_FLAG_CAN_NOT_CREATE_WORKFLOW, "error in create workflow instance: "+errorInNewWorkflow.Error())
-// 		return
-// 	}
-// 	fmt.Printf("workflow: %+v\n", workflow)
+	// init workflow instace
+	workflow, errorInNewWorkflow := model.NewWorkflowByCreateRequest(parsedUserID, createWorkflowRequest)
+	if errorInNewWorkflow != nil {
+		controller.FeedbackBadRequest(c, ERROR_FLAG_CAN_NOT_CREATE_WORKFLOW, "error in create workflow instance: "+errorInNewWorkflow.Error())
+		return
+	}
+	fmt.Printf("workflow: %+v\n", workflow)
 
-// 	// validate flowAction options
-// 	// errInValidateActionOptions := controller.ValidateFlowActionTemplate(c, flowAction)
-// 	// if errInValidateActionOptions != nil {
-// 	// 	return
-// 	// }
+	// validate flowAction options
+	// errInValidateActionOptions := controller.ValidateFlowActionTemplate(c, flowAction)
+	// if errInValidateActionOptions != nil {
+	// 	return
+	// }
 
-// 	// create workflow
-// 	_, errInCreateWorkflow := controller.Repository.WorkflowRepository.Create(workflow)
-// 	if errInCreateWorkflow != nil {
-// 		controller.FeedbackBadRequest(c, ERROR_FLAG_CAN_NOT_CREATE_WORKFLOW, "create workflow error: "+errInCreateWorkflow.Error())
-// 		return
-// 	}
+	// create workflow
+	_, errInCreateWorkflow := controller.Repository.WorkflowRepository.Create(workflow)
+	if errInCreateWorkflow != nil {
+		controller.FeedbackBadRequest(c, ERROR_FLAG_CAN_NOT_CREATE_WORKFLOW, "create workflow error: "+errInCreateWorkflow.Error())
+		return
+	}
 
-// 	// feedback
-// 	controller.FeedbackOK(c, response.NewCreateWorkflowResponse(workflow))
-// }
+	// feedback
+	controller.FeedbackOK(c, response.NewCreateWorkflowResponse(workflow))
+}
 
 // func (controller *Controller) UpdateFlowAction(c *gin.Context) {
 // 	// fetch needed param

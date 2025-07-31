@@ -15,10 +15,9 @@ type GetWorkflowResponse struct {
 	DisplayName       string                 `json:"displayName"`
 	WorkflowType      string                 `json:"workflowType"`
 	IsVirtualResource bool                   `json:"isVirtualResource"`
-	Content           map[string]interface{} `json:"content"`
+	Template          map[string]interface{} `json:"template"`
 	Transformer       map[string]interface{} `json:"transformer"`
 	TriggerMode       string                 `json:"triggerMode"`
-	Template          map[string]interface{} `json:"template"`
 	Config            map[string]interface{} `json:"config"`
 	CreatedAt         time.Time              `json:"createdAt,omitempty"`
 	CreatedBy         uuid.UUID              `json:"createdBy,omitempty"`
@@ -34,7 +33,7 @@ func NewGetWorkflowResponse(workflow *model.Workflow) *GetWorkflowResponse {
 		DisplayName:  workflow.Name,
 		WorkflowType: resourcelist.GetResourceIDMappedType(workflow.Type),
 		// IsVirtualResource: workflowConfig.IsVirtualResource,
-		Content:     workflow.ExportTemplateInMap(),
+		Template:    workflow.ExportTemplateInMap(),
 		Transformer: workflow.ExportTransformerInMap(),
 		TriggerMode: workflow.TriggerMode,
 		Config:      workflow.ExportConfigInMap(),

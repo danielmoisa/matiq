@@ -16,7 +16,7 @@ type CreateWorkflowResponse struct {
 	DisplayName       string                 `json:"displayName"`
 	ActionType        string                 `json:"flowActionType"`
 	IsVirtualResource bool                   `json:"isVirtualResource"`
-	Content           map[string]interface{} `json:"content"`
+	Template          map[string]interface{} `json:"template"`
 	Transformer       map[string]interface{} `json:"transformer"`
 	TriggerMode       string                 `json:"triggerMode"`
 	Config            map[string]interface{} `json:"config"`
@@ -35,7 +35,7 @@ func NewCreateWorkflowResponse(workflow *model.Workflow) *CreateWorkflowResponse
 		DisplayName: workflow.Name,
 		ActionType:  resourcelist.GetResourceIDMappedType(workflow.Type),
 		// IsVirtualResource: flowActionConfig.IsVirtualResource,
-		Content:     workflow.ExportTemplateInMap(),
+		Template:    workflow.ExportTemplateInMap(),
 		Transformer: workflow.ExportTransformerInMap(),
 		TriggerMode: workflow.TriggerMode,
 		Config:      workflow.ExportConfigInMap(),
