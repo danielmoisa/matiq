@@ -48,5 +48,6 @@ func (r *Router) RegisterRouters(engine *gin.Engine) {
 	workflowRouter.POST("", r.Controller.CreateWorkflow)
 	workflowRouter.GET("/:workflowID", r.Controller.GetWorkflow)
 	workflowRouter.GET("", r.Controller.GetWorkflows)
+	workflowRouter.PUT("/:workflowID", r.Controller.UpdateWorkflow)
 
 }

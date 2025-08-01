@@ -37,8 +37,6 @@ func NewPostgresConnection(config *PostgresConfig, logger *zap.SugaredLogger) (*
 	var err error
 	retries := RETRY_TIMES
 
-	fmt.Println(config)
-
 	db, err = gorm.Open(postgres.New(postgres.Config{
 		DSN: fmt.Sprintf("host='%s' user='%s' password='%s' dbname='%s' port='%s' sslmode=disable",
 			config.Addr, config.User, config.Password, config.Database, config.Port),

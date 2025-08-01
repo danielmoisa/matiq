@@ -47,9 +47,13 @@ export class WorkflowService {
   }
 
   // Create a new workflow
-  static async createWorkflow(workflow: Partial<Workflow>): Promise<Workflow> {
+  static async createWorkflow(
+    workflow: Partial<Workflow>, 
+    nodes: WorkflowNode[] = [], 
+    connections: Connection[] = []
+  ): Promise<Workflow> {
     try {
-      const requestData = convertFrontendToBackendRequest(workflow);
+      const requestData = convertFrontendToBackendRequest(workflow, nodes, connections);
       
       const backendWorkflow = await apiClient.post<WorkflowBackend>(`/api/v1/workflows`, requestData);
       
@@ -67,10 +71,12 @@ export class WorkflowService {
   // Update an existing workflow
   static async updateWorkflow(
     workflowId: string, 
-    workflow: Partial<Workflow>
+    workflow: Partial<Workflow>,
+    nodes: WorkflowNode[] = [],
+    connections: Connection[] = []
   ): Promise<Workflow> {
     try {
-      const requestData = convertFrontendToBackendRequest(workflow);
+      const requestData = convertFrontendToBackendRequest(workflow, nodes, connections);
       
       const backendWorkflow = await apiClient.put<WorkflowBackend>(
         `/api/v1/workflows/${workflowId}`, 
@@ -122,29 +128,15 @@ export class WorkflowService {
     }>(`/api/v1/workflows/${workflowId}/executions/${executionId}`);
   }
 
-  // Save workflow (nodes and connections)
+  // Save workflow (nodes and connections) - this is an alias for updateWorkflow
   static async saveWorkflow(
     workflowId: string, 
     nodes: WorkflowNode[], 
     connections: Connection[]
   ): Promise<Workflow> {
     try {
-      const requestData = convertFrontendToBackendRequest(
-        { name: 'Updated Workflow' }, // Will be overridden by existing name
-        nodes,
-        connections
-      );
-      
-      const backendWorkflow = await apiClient.put<WorkflowBackend>(
-        `/api/v1/workflows/${workflowId}`,
-        requestData
-      );
-      
-      if (!backendWorkflow) {
-        throw new Error('Save workflow response is empty');
-      }
-      
-      return convertBackendToFrontend(backendWorkflow);
+      // Use updateWorkflow with empty workflow object since we're just updating nodes/connections
+      return await this.updateWorkflow(workflowId, {}, nodes, connections);
     } catch (error) {
       console.error(`Failed to save workflow ${workflowId}:`, error);
       throw new Error(error instanceof Error ? error.message : 'Failed to save workflow');

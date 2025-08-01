@@ -36,8 +36,8 @@ func (impl *WorkflowRepository) Delete(teamID int, workflowID int) error {
 	return nil
 }
 
-func (impl *WorkflowRepository) UpdateWholeFlowAction(action *model.Workflow) error {
-	if err := impl.db.Model(action).Where("uid = ?", action.UID).UpdateColumns(action).Error; err != nil {
+func (impl *WorkflowRepository) Update(workflow *model.Workflow) error {
+	if err := impl.db.Model(workflow).Where("uid = ?", workflow.UID).UpdateColumns(workflow).Error; err != nil {
 		return err
 	}
 	return nil

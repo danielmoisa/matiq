@@ -36,7 +36,7 @@ export function useWorkflow(workflowId?: string) {
     setError(null);
     try {
       const updatedWorkflow = await WorkflowService.saveWorkflow(
-        workflow.id,
+        workflow.uid || workflow.id, // Use UUID first, fallback to id
         nodes,
         connections
       );
@@ -154,7 +154,7 @@ export function useWorkflowList() {
     setError(null);
     try {
       await WorkflowService.deleteWorkflow(id);
-      setWorkflows(prev => prev.filter(w => w.id !== id));
+      setWorkflows(prev => prev.filter(w => w.uid !== id && w.id !== id)); // Filter by both uid and id
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Failed to delete workflow');
       throw err;

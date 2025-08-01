@@ -99,6 +99,18 @@ func (action *Workflow) InitUpdatedAt() {
 	action.UpdatedAt = time.Now().UTC()
 }
 
+func (workflow *Workflow) UpdateWithRequest(userID uuid.UUID, req *request.UpdateWorkflowRequest) {
+	workflow.ResourceID = idconvertor.ConvertStringToInt(req.ResourceID)
+	workflow.Name = req.DisplayName
+	workflow.Type = resourcelist.GetResourceNameMappedID(req.WorkflowType)
+	workflow.TriggerMode = req.TriggerMode
+	workflow.Transformer = req.ExportTransformerInString()
+	workflow.Template = req.ExportTemplateInString()
+	workflow.Config = req.ExportConfigInString()
+	workflow.UpdatedBy = userID
+	workflow.InitUpdatedAt()
+}
+
 func (action *Workflow) InitForFork(userID uuid.UUID) {
 	action.CreatedBy = userID
 	action.UpdatedBy = userID

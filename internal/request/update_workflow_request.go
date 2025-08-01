@@ -51,7 +51,7 @@ type UpdateWorkflowRequest struct {
 	DisplayName       string                 `json:"displayName"            validate:"required"`
 	ResourceID        string                 `json:"resourceID,omitempty"`
 	IsVirtualResource bool                   `json:"isVirtualResource"`
-	Content           map[string]interface{} `json:"content"                validate:"required"`
+	Template          map[string]interface{} `json:"template"                validate:"required"`
 	Transformer       map[string]interface{} `json:"transformer"            validate:"required"`
 	TriggerMode       string                 `json:"triggerMode"            validate:"oneof=manually automate"`
 	Config            map[string]interface{} `json:"config"`
@@ -79,7 +79,7 @@ func (req *UpdateWorkflowRequest) ExportWorkflowTypeInInt() int {
 }
 
 func (req *UpdateWorkflowRequest) ExportTemplateInString() string {
-	jsonByte, _ := json.Marshal(req.Content)
+	jsonByte, _ := json.Marshal(req.Template)
 	return string(jsonByte)
 }
 
@@ -89,7 +89,7 @@ func (req *UpdateWorkflowRequest) ExportConfigInString() string {
 }
 
 func (req *UpdateWorkflowRequest) AppendVirtualResourceToTemplate(value interface{}) {
-	req.Content[ACTION_REQUEST_CONTENT_FIELD_VIRTUAL_RESOURCE] = value
+	req.Template[ACTION_REQUEST_CONTENT_FIELD_VIRTUAL_RESOURCE] = value
 }
 
 func (req *UpdateWorkflowRequest) IsVirtualAction() bool {

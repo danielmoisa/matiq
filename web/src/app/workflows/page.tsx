@@ -14,7 +14,7 @@ export default function WorkflowsPage() {
   const handleCreateWorkflow = async (name: string, description: string) => {
     setCreateLoading(true);
     try {
-      await WorkflowService.createWorkflow({ name, description });
+      await WorkflowService.createWorkflow({ name, description }, [], []);
       setShowCreateModal(false);
       loadWorkflows(); // Refresh the list
     } catch (error) {
@@ -85,63 +85,81 @@ export default function WorkflowsPage() {
           </div>
         )}
 
-        {workflows.length === 0 && !loading ? (
-          // Empty state
-          <div className="text-center py-12">
-            <div className="text-6xl mb-4">⚡</div>
-            <h3 className="text-xl font-medium text-gray-900 mb-2">No workflows yet</h3>
-            <p className="text-gray-600 mb-6">Get started by creating your first automation workflow</p>
-            <button
-              onClick={() => setShowCreateModal(true)}
-              className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-lg font-medium transition-colors"
-            >
-              Create Your First Workflow
-            </button>
-          </div>
-        ) : (
-          // Workflows grid
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {workflows.map((workflow) => (
-              <div key={workflow.uid} className="bg-white rounded-lg shadow-sm border border-gray-200 hover:shadow-md transition-shadow">
-                <div className="p-6">
-                  <div className="flex justify-between items-start mb-4">
-                    <h3 className="text-lg font-semibold text-gray-900 truncate">{workflow.name}</h3>
-                    <span className={`px-2 py-1 rounded-full text-xs font-medium ${getStatusColor(workflow.status)}`}>
-                      {workflow.status}
-                    </span>
-                  </div>
-                  
-                  {workflow.description && (
-                    <p className="text-gray-600 text-sm mb-4 line-clamp-2">{workflow.description}</p>
-                  )}
-                  
-                  <div className="flex items-center text-sm text-gray-500 mb-4">
-                    <span className="mr-4">📊 {workflow.nodes.length} nodes</span>
-                    <span>🔗 {workflow.connections.length} connections</span>
-                  </div>
-                  
-                  <div className="text-xs text-gray-500 mb-4">
-                    <div>Created: {formatDate(workflow.createdAt)}</div>
-                    <div>Updated: {formatDate(workflow.updatedAt)}</div>
-                  </div>
-                  
-                  <div className="flex space-x-2">
-                    <Link
-                      href={`/workflows/${workflow.uid}`}
-                      className="flex-1 bg-blue-600 hover:bg-blue-700 text-white text-center py-2 rounded-md text-sm font-medium transition-colors"
-                    >
-                      Open
-                    </Link>
-                    <button
-                      onClick={() => handleDeleteWorkflow(workflow.id, workflow.name)}
-                      className="px-3 py-2 border border-red-300 text-red-700 hover:bg-red-50 rounded-md text-sm font-medium transition-colors"
-                    >
-                      Delete
-                    </button>
-                  </div>
-                </div>
+        {!loading && (
+          <div>
+            {/* Header with Create Button */}
+            <div className="flex justify-between items-center mb-6">
+              <div>
+                <h1 className="text-2xl font-bold text-gray-900">Workflows</h1>
+                <p className="text-gray-600 mt-1">Manage and monitor your automation workflows</p>
               </div>
-            ))}
+              <Link
+                href="/workflows/create"
+                className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg font-medium transition-colors inline-flex items-center"
+              >
+                <span className="mr-2">+</span>
+                Create Workflow
+              </Link>
+            </div>
+
+            {/* Workflows grid */}
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+              {workflows.length === 0 ? (
+                <div className="col-span-full text-center py-12">
+                  <div className="text-6xl mb-4">⚡</div>
+                  <h3 className="text-xl font-medium text-gray-900 mb-2">No workflows yet</h3>
+                  <p className="text-gray-600 mb-6">Get started by creating your first automation workflow</p>
+                  <Link
+                    href="/workflows/create"
+                    className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-lg font-medium transition-colors inline-block"
+                  >
+                    Create Your First Workflow
+                  </Link>
+                </div>
+              ) : (
+                workflows.map((workflow) => (
+                  <div key={workflow.uid} className="bg-white rounded-lg shadow-sm border border-gray-200 hover:shadow-md transition-shadow">
+                    <div className="p-6">
+                      <div className="flex justify-between items-start mb-4">
+                        <h3 className="text-lg font-semibold text-gray-900 truncate">{workflow.name}</h3>
+                        <span className={`px-2 py-1 rounded-full text-xs font-medium ${getStatusColor(workflow.status)}`}>
+                          {workflow.status}
+                        </span>
+                      </div>
+                      
+                      {workflow.description && (
+                        <p className="text-gray-600 text-sm mb-4 line-clamp-2">{workflow.description}</p>
+                      )}
+                      
+                      <div className="flex items-center text-sm text-gray-500 mb-4">
+                        <span className="mr-4">📊 {workflow.nodes.length} nodes</span>
+                        <span>🔗 {workflow.connections.length} connections</span>
+                      </div>
+                      
+                      <div className="text-xs text-gray-500 mb-4">
+                        <div>Created: {formatDate(workflow.createdAt)}</div>
+                        <div>Updated: {formatDate(workflow.updatedAt)}</div>
+                      </div>
+                      
+                      <div className="flex space-x-2">
+                        <Link
+                          href={`/workflows/${workflow.uid}`}
+                          className="flex-1 bg-blue-600 hover:bg-blue-700 text-white text-center py-2 rounded-md text-sm font-medium transition-colors"
+                        >
+                          Open
+                        </Link>
+                        <button
+                          onClick={() => handleDeleteWorkflow(workflow.uid || workflow.id, workflow.name)}
+                          className="px-3 py-2 border border-red-300 text-red-700 hover:bg-red-50 rounded-md text-sm font-medium transition-colors"
+                        >
+                          Delete
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+                ))
+              )}
+            </div>
           </div>
         )}
       </div>

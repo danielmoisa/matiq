@@ -78,6 +78,77 @@ func (controller *Controller) CreateWorkflow(c *gin.Context) {
 	controller.FeedbackOK(c, response.NewCreateWorkflowResponse(workflow))
 }
 
+func (controller *Controller) UpdateWorkflow(c *gin.Context) {
+	// Get workflow ID directly as string from URL parameter
+	workflowIDParam := c.Param("workflowID")
+	if workflowIDParam == "" {
+		controller.FeedbackBadRequest(c, ERROR_FLAG_VALIDATE_REQUEST_PARAM_FAILED, "workflow ID is required")
+		return
+	}
+
+	// Get user ID from Keycloak authentication
+	userID, errInGetUserID := controller.GetUserIDFromKeycloakAuth(c)
+	if errInGetUserID != nil {
+		controller.FeedbackBadRequest(c, ERROR_FLAG_ACCESS_DENIED, "authentication required")
+		return
+	}
+
+	// Parse workflow ID string to UUID
+	parsedWorkflowID, errInParse := uuid.Parse(workflowIDParam)
+	if errInParse != nil {
+		controller.FeedbackBadRequest(c, ERROR_FLAG_VALIDATE_REQUEST_PARAM_FAILED, "invalid workflow ID format: "+errInParse.Error())
+		return
+	}
+
+	// Parse user ID to UUID
+	parsedUserID, errInParseUser := uuid.Parse(userID)
+	if errInParseUser != nil {
+		controller.FeedbackBadRequest(c, ERROR_FLAG_VALIDATE_REQUEST_PARAM_FAILED, "invalid user ID format: "+errInParseUser.Error())
+		return
+	}
+
+	// Fetch the existing workflow to verify ownership
+	existingWorkflow, errInGetWorkflow := controller.Repository.WorkflowRepository.RetrieveWorkflowByID(parsedWorkflowID)
+	if errInGetWorkflow != nil {
+		controller.FeedbackBadRequest(c, ERROR_FLAG_CAN_NOT_GET_WORKFLOW, "get workflow error: "+errInGetWorkflow.Error())
+		return
+	}
+
+	// Check if the workflow was created by the current user
+	if existingWorkflow.CreatedBy != parsedUserID {
+		controller.FeedbackBadRequest(c, ERROR_FLAG_ACCESS_DENIED, "you can only update workflows that you created")
+		return
+	}
+
+	// fetch payload
+	updateWorkflowRequest := request.NewUpdateWorkflowRequest()
+	if err := json.NewDecoder(c.Request.Body).Decode(&updateWorkflowRequest); err != nil {
+		controller.FeedbackBadRequest(c, ERROR_FLAG_PARSE_REQUEST_BODY_FAILED, "parse request body error: "+err.Error())
+		return
+	}
+	fmt.Printf("updateWorkflowRequest: %+v\n", updateWorkflowRequest)
+
+	// Update the existing workflow with new data
+	existingWorkflow.UpdateWithRequest(parsedUserID, updateWorkflowRequest)
+	fmt.Printf("updated workflow: %+v\n", existingWorkflow)
+
+	// validate workflow options
+	// errInValidateActionOptions := controller.ValidateFlowActionTemplate(c, existingWorkflow)
+	// if errInValidateActionOptions != nil {
+	// 	return
+	// }
+
+	// update workflow in database
+	errInUpdateWorkflow := controller.Repository.WorkflowRepository.Update(existingWorkflow)
+	if errInUpdateWorkflow != nil {
+		controller.FeedbackBadRequest(c, ERROR_FLAG_CAN_NOT_UPDATE_WORKFLOW, "update workflow error: "+errInUpdateWorkflow.Error())
+		return
+	}
+
+	// feedback
+	controller.FeedbackOK(c, response.NewUpdateWorkflowResponse(existingWorkflow))
+}
+
 // func (controller *Controller) UpdateFlowAction(c *gin.Context) {
 // 	// fetch needed param
 // 	teamID, errInGetTeamID := controller.GetMagicIntParamFromRequest(c, PARAM_TEAM_ID)
