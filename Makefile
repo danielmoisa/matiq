@@ -1,4 +1,4 @@
-.PHONY: build all test clean
+ .PHONY: build all test                                                                                                                                                                             clean
 
 all: build
 
@@ -14,7 +14,7 @@ seed:
 seed-workflows:
 	go run ./cmd/seeder/main.go -type=workflows
 
-build: build-http-server build-websocket-server build-http-server-internal build-seeder
+build: build-http-server build-websocket-server build-seeder
 
 build-http-server:
 	go build -o bin/matiq src/cmd/matiq/main.go
