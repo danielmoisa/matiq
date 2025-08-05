@@ -423,7 +423,7 @@ func (kc *KeycloakConfig) Validate() error {
 	return nil
 }
 
-// IsEnabled checks if Keycloak is enabled (has basic required config)
+// IsKeycloakEnabled checks if Keycloak is enabled
 func (c *Config) IsKeycloakEnabled() bool {
 	return c.KeycloakURL != "" && c.KeycloakRealm != "" && c.KeycloakClientID != ""
 }
