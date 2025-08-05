@@ -3,7 +3,6 @@ package redis
 import (
 	"crypto/tls"
 
-	"github.com/go-redis/redis/v8"
 	"github.com/mitchellh/mapstructure"
 	"github.com/redis/go-redis/v9"
 )

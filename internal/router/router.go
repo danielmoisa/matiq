@@ -24,7 +24,7 @@ func (r *Router) RegisterRouters(engine *gin.Engine) {
 	healthRouter := routerGroup.Group("/health")
 	workflowRouter := routerGroup.Group("/workflows")
 	authRouter := routerGroup.Group("/auth")
-	flowActionRouter := routerGroup.Group("/flows/:workflow_id")
+	// flowActionRouter := routerGroup.Group("/flows/:workflow_id")
 
 	// health router
 	healthRouter.GET("", r.Controller.GetHealth)
@@ -50,13 +50,7 @@ func (r *Router) RegisterRouters(engine *gin.Engine) {
 	workflowRouter.GET("/:workflowID", r.Controller.GetWorkflow)
 	workflowRouter.GET("", r.Controller.GetWorkflows)
 	workflowRouter.PUT("/:workflowID", r.Controller.UpdateWorkflow)
+	// workflowRouter.DELETE("/:workflowID", r.Controller.DeleteWorkflow)
+	// flowActionRouter.POST("/:flowActionID/run", r.Controller.RunFlowAction)
 
-	// Flow action routers
-	// Protected -- requires Bearer token
-	flowActionRouter.POST("", r.Controller.CreateFlowAction)
-	flowActionRouter.GET("/:flowActionID", r.Controller.GetFlowAction)
-	flowActionRouter.PUT("/:flowActionID", r.Controller.UpdateFlowAction)
-	flowActionRouter.DELETE("/:flowActionID", r.Controller.DeleteFlowAction)
-	flowActionRouter.POST("/:flowActionID/run", r.Controller.RunFlowAction)
-	flowActionRouter.PUT("/byBatch", r.Controller.UpdateFlowActionByBatch)
 }
