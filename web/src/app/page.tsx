@@ -40,10 +40,10 @@ export default function Home() {
         <div className="text-center">
           <div className="text-8xl mb-8">⚡</div>
           <h2 className="text-4xl font-bold text-gray-900 mb-4">
-            Build Powerful Automation Workflows
+            Build Powerful Automation Flows
           </h2>
           <p className="text-xl text-gray-600 mb-8 max-w-3xl mx-auto">
-            Create visual workflows that connect your favorite tools and services. 
+            Create visual flows that connect your favorite tools and services. 
             Drag and drop components, configure triggers, and automate your processes with ease.
           </p>
           
@@ -69,7 +69,7 @@ export default function Home() {
             <div className="text-4xl mb-4">🎯</div>
             <h3 className="text-xl font-semibold text-gray-900 mb-2">Visual Builder</h3>
             <p className="text-gray-600">
-              Drag and drop components to build workflows visually. No coding required.
+              Drag and drop components to build flows visually. No coding required.
             </p>
           </div>
           

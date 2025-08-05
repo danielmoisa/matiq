@@ -1,10 +1,10 @@
 'use client';
 
-import { WorkflowNode, NodeType } from '@/types/workflow';
+import { FlowNode, NodeType } from '@/types/flow';
 import { useDraggable } from '@dnd-kit/core';
 
 interface NodeComponentProps {
-  node: WorkflowNode;
+  node: FlowNode;
   isSelected: boolean;
   isConnecting: boolean;
   onStartConnection: (nodeId: string, position: { x: number; y: number }) => void;
@@ -60,7 +60,7 @@ const getNodeIcon = (type: string) => {
     [NodeType.AIRTABLE]: '📋',
     [NodeType.APPWRITE]: '📱',
     
-    // Workflow Control
+    // Flow Control
     [NodeType.TRIGGER]: '🎯',
     [NodeType.SERVER_SIDE_TRANSFORMER]: '⚙️',
     [NodeType.CONDITION]: '🔀',
@@ -79,7 +79,7 @@ const getNodeIcon = (type: string) => {
 };
 
 const getNodeColor = (type: string) => {
-  // Triggers and Workflow Control
+  // Triggers and Flow Control
   if ([NodeType.SCHEDULE, NodeType.WEBHOOK, NodeType.TRIGGER].includes(type as NodeType)) 
     return 'bg-green-100 border-green-300 text-green-800';
   
@@ -106,7 +106,7 @@ const getNodeColor = (type: string) => {
   if ([NodeType.REDIS, NodeType.UPSTASH].includes(type as NodeType)) 
     return 'bg-red-100 border-red-300 text-red-800';
   
-  // Workflow Actions
+  // Flow Actions
   if ([NodeType.TRANSFORMER, NodeType.SERVER_SIDE_TRANSFORMER, NodeType.CONDITION, 
        NodeType.WEBHOOK_RESPONSE, NodeType.LOOP, NodeType.RESPONSE, NodeType.ERROR_HANDLER].includes(type as NodeType)) 
     return 'bg-indigo-100 border-indigo-300 text-indigo-800';

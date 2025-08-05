@@ -45,7 +45,7 @@ export enum NodeType {
   AIRTABLE = 'airtable',
   APPWRITE = 'appwrite',
   
-  // Workflow Control
+  // Flow Control
   TRIGGER = 'trigger',
   SERVER_SIDE_TRANSFORMER = 'serversidetransformer',
   CONDITION = 'condition',
@@ -70,7 +70,7 @@ export interface Position {
   y: number;
 }
 
-export interface WorkflowNode {
+export interface FlowNode {
   id: string;
   type: EventType;
   triggerType?: TriggerType;
@@ -118,7 +118,7 @@ export interface Flow {
   id: string;                   // Use resourceID as string
   name: string;
   description?: string;
-  nodes: WorkflowNode[];
+  nodes: FlowNode[];
   connections: Connection[];
   isActive: boolean;
   status: "active" | "draft" | "paused" | "error";
@@ -131,13 +131,9 @@ export interface Flow {
   actionType?: string;
 }
 
-// Legacy alias for backward compatibility
-export type Workflow = Flow;
-export type WorkflowBackend = FlowBackend;
-
 // Template structure stored in backend template field
 interface FlowTemplate {
-  nodes?: WorkflowNode[];
+  nodes?: FlowNode[];
   connections?: Connection[];
   resourceID?: number;
   runByAnonymous?: boolean;
@@ -163,7 +159,7 @@ export function convertBackendToFrontend(backend: FlowBackend | null | undefined
   }
 
   // Extract nodes and connections from template
-  let nodes: WorkflowNode[] = [];
+  let nodes: FlowNode[] = [];
   let connections: Connection[] = [];
 
   if (backend.template && typeof backend.template === 'object') {
@@ -183,7 +179,7 @@ export function convertBackendToFrontend(backend: FlowBackend | null | undefined
           position: backendNode.position || { x: 0, y: 0 },
           data: backendNode.data || {},
           connections: backendNode.connections || []
-        } as WorkflowNode;
+        } as FlowNode;
       });
     }
     
@@ -217,7 +213,7 @@ export function convertBackendToFrontend(backend: FlowBackend | null | undefined
 // Convert frontend flow to backend create/update request
 export function convertFrontendToBackendRequest(
   flow: Partial<Flow>,
-  nodes: WorkflowNode[] = [],
+  nodes: FlowNode[] = [],
   connections: Connection[] = []
 ): {
   displayName: string;

@@ -49,7 +49,7 @@ export default withAuth(
         }
 
         // Dashboard and other protected routes just need authentication
-        if (pathname.startsWith('/dashboard') || pathname.startsWith('/workflows')) {
+        if (pathname.startsWith('/dashboard') || pathname.startsWith('/flows')) {
           return true
         }
 
@@ -63,7 +63,7 @@ export const config = {
   matcher: [
     // Protect these routes
     '/dashboard/:path*',
-    '/workflows/:path*',
+    '/flows/:path*',
     '/admin/:path*',
     '/profile/:path*',
   ]

@@ -1,15 +1,15 @@
 'use client';
 
 import { useParams } from 'next/navigation';
-import { useWorkflow } from '@/hooks/useWorkflow';
-import WorkflowBuilder from '@/components/WorkflowBuilder';
+import { useFlow } from '@/hooks/useFlow';
+import FlowBuilder from '@/components/FlowBuilder';
 import Link from 'next/link';
 import { AppLayout } from '@/components/layout/AppLayout';
 
-export default function WorkflowPage() {
+export default function FlowPage() {
   const params = useParams();
-  const workflowId = params.id as string;
-  const { flow, loading, error } = useWorkflow(workflowId);
+  const flowId = params.id as string;
+  const { flow, loading, error } = useFlow(flowId);
 
   if (loading) {
     return (
@@ -33,10 +33,10 @@ export default function WorkflowPage() {
             <h3 className="text-xl font-medium text-gray-900 mb-2">Failed to load flow</h3>
             <p className="text-gray-600 mb-6">{error}</p>
             <Link
-              href="/workflows"
+              href="/flows"
               className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-lg font-medium transition-colors inline-block"
             >
-              Back to Workflows
+              Back to Flows
             </Link>
           </div>
         </div>
@@ -50,13 +50,13 @@ export default function WorkflowPage() {
         <div className="min-h-[calc(100vh-4rem)] bg-gray-50 flex items-center justify-center">
           <div className="text-center max-w-md">
             <div className="text-6xl mb-4">❓</div>
-            <h3 className="text-xl font-medium text-gray-900 mb-2">Workflow not found</h3>
+            <h3 className="text-xl font-medium text-gray-900 mb-2">Flow not found</h3>
             <p className="text-gray-600 mb-6">The flow you&apos;re looking for doesn&apos;t exist or has been deleted.</p>
             <Link
-              href="/workflows"
+              href="/flows"
               className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-lg font-medium transition-colors inline-block"
             >
-              Back to Workflows
+              Back to Flows
             </Link>
           </div>
         </div>
@@ -67,7 +67,7 @@ export default function WorkflowPage() {
   return (
     <AppLayout>
       <div className="h-[calc(100vh-4rem)]">
-        <WorkflowBuilder workflowId={workflowId} />
+        <FlowBuilder flowId={flowId} />
       </div>
     </AppLayout>
   );

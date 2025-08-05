@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import { EventType, TriggerType, NodeType } from '@/types/workflow';
+import { EventType, TriggerType, NodeType } from '@/types/flow';
 
 interface SidebarProps {
   onAddNode: (type: EventType, triggerType?: TriggerType) => void;
@@ -104,7 +104,7 @@ export default function Sidebar({ onAddNode }: SidebarProps) {
     <aside className="w-80 bg-gray-50 border-r border-gray-200 flex flex-col">
       <div className="p-4 border-b border-gray-200">
         <h2 className="text-lg font-semibold text-gray-900">Components</h2>
-        <p className="text-sm text-gray-500 mt-1">Drag and drop to build your workflow</p>
+        <p className="text-sm text-gray-500 mt-1">Drag and drop to build your flow</p>
       </div>
 
       <div className="flex flex-wrap border-b border-gray-200">

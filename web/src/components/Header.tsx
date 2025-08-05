@@ -3,14 +3,14 @@
 import Link from 'next/link';
 
 interface HeaderProps {
-  workflowName?: string;
+  flowName?: string;
   onSave?: () => void;
   onPublish?: () => void;
   saving?: boolean;
 }
 
 export default function Header({ 
-  workflowName,
+  flowName,
   onSave,
   onPublish,
   saving = false
@@ -32,13 +32,13 @@ export default function Header({
           <div className="flex items-center space-x-2 text-sm text-gray-500">
             <Link href="/" className="hover:text-gray-700">Home</Link>
             <span>›</span>
-            <Link href="/workflows" className="hover:text-gray-700">Workflows</Link>
+            <Link href="/flows" className="hover:text-gray-700">Flows</Link>
             <span>›</span>
             <span>Edit</span>
           </div>
           <div className="h-6 w-px bg-gray-300" />
           <h2 className="text-lg font-medium text-gray-900">
-            {workflowName || 'Untitled Workflow'}
+            {flowName || 'Untitled Flow'}
           </h2>
         </div>
         
@@ -58,9 +58,9 @@ export default function Header({
             Publish
           </button>
           <Link
-            href="/workflows"
+            href="/flows"
             className="p-2 text-gray-400 hover:text-gray-600 transition-colors"
-            title="Back to workflows"
+            title="Back to flows"
           >
             <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />

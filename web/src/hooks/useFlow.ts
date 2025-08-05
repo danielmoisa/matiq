@@ -1,24 +1,24 @@
 import { useState, useEffect } from 'react';
-import { Workflow, WorkflowNode, Connection } from '@/types/workflow';
-import { WorkflowService } from '@/services/workflow-service';
+import { Flow, FlowNode, Connection } from '@/types/flow';
+import { FlowService } from '@/services/flow-service';
 
 // Hook for managing flow state
-export function useWorkflow(workflowId?: string) {
-  const [flow, setWorkflow] = useState<Workflow | null>(null);
-  const [nodes, setNodes] = useState<WorkflowNode[]>([]);
+export function useFlow(flowId?: string) {
+  const [flow, setFlow] = useState<Flow | null>(null);
+  const [nodes, setNodes] = useState<FlowNode[]>([]);
   const [connections, setConnections] = useState<Connection[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
   // Load flow data
-  const loadWorkflow = async (id: string) => {
+  const loadFlow = async (id: string) => {
     setLoading(true);
     setError(null);
     try {
-      const workflowData = await WorkflowService.getWorkflow(id);
-      setWorkflow(workflowData);
-      setNodes(workflowData.nodes || []);
-      setConnections(workflowData.connections || []);
+      const flowData = await FlowService.getFlow(id);
+      setFlow(flowData);
+      setNodes(flowData.nodes || []);
+      setConnections(flowData.connections || []);
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Failed to load flow');
       setNodes([]);
@@ -29,18 +29,18 @@ export function useWorkflow(workflowId?: string) {
   };
 
   // Save flow changes
-  const saveWorkflow = async () => {
+  const saveFlow = async () => {
     if (!flow) return;
     
     setLoading(true);
     setError(null);
     try {
-      const updatedWorkflow = await WorkflowService.saveWorkflow(
+      const updatedFlow = await FlowService.saveFlow(
         flow.uid || flow.id, // Use UUID first, fallback to id
         nodes,
         connections
       );
-      setWorkflow(updatedWorkflow);
+      setFlow(updatedFlow);
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Failed to save flow');
     } finally {
@@ -49,20 +49,20 @@ export function useWorkflow(workflowId?: string) {
   };
 
   // Create new flow
-  const createWorkflow = async (name: string, description?: string) => {
+  const createFlow = async (name: string, description?: string) => {
     setLoading(true);
     setError(null);
     try {
-      const newWorkflow = await WorkflowService.createWorkflow({
+      const newFlow = await FlowService.createFlow({
         name,
         description,
         nodes: [],
         connections: []
       });
-      setWorkflow(newWorkflow);
+      setFlow(newFlow);
       setNodes([]);
       setConnections([]);
-      return newWorkflow;
+      return newFlow;
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Failed to create flow');
       throw err;
@@ -72,13 +72,13 @@ export function useWorkflow(workflowId?: string) {
   };
 
   // Execute flow
-  const executeWorkflow = async (input?: Record<string, unknown>) => {
+  const executeFlow = async (input?: Record<string, unknown>) => {
     if (!flow) return;
     
     setLoading(true);
     setError(null);
     try {
-      const result = await WorkflowService.executeWorkflow(flow.id, input);
+      const result = await FlowService.executeFlow(flow.id, input);
       return result;
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Failed to execute flow');
@@ -91,10 +91,10 @@ export function useWorkflow(workflowId?: string) {
 
   // Load flow on mount if ID provided
   useEffect(() => {
-    if (workflowId) {
-      loadWorkflow(workflowId);
+    if (flowId) {
+      loadFlow(flowId);
     }
-  }, [workflowId]);
+  }, [flowId]);
 
   return {
     flow,
@@ -104,38 +104,38 @@ export function useWorkflow(workflowId?: string) {
     setConnections,
     loading,
     error,
-    loadWorkflow,
-    saveWorkflow,
-    createWorkflow,
-    executeWorkflow,
+    loadFlow,
+    saveFlow,
+    createFlow,
+    executeFlow,
   };
 }
 
 // Hook for managing flow list
-export function useWorkflowList() {
-  const [workflows, setWorkflows] = useState<Workflow[]>([]);
+export function useFlowList() {
+  const [flows, setFlows] = useState<Flow[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  const loadWorkflows = async () => {
+  const loadFlows = async () => {
     setLoading(true);
     setError(null);
     try {
-      const workflowList = await WorkflowService.getWorkflows();
-      setWorkflows(workflowList);
+      const flowList = await FlowService.getFlows();
+      setFlows(flowList);
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Failed to load workflows');
+      setError(err instanceof Error ? err.message : 'Failed to load flows');
     } finally {
       setLoading(false);
     }
   };
 
-  const deleteWorkflow = async (id: string) => {
+  const deleteFlow = async (id: string) => {
     setLoading(true);
     setError(null);
     try {
-      await WorkflowService.deleteWorkflow(id);
-      setWorkflows(prev => prev.filter(w => w.uid !== id && w.id !== id)); // Filter by both uid and id
+      await FlowService.deleteFlow(id);
+      setFlows(prev => prev.filter(w => w.uid !== id && w.id !== id)); // Filter by both uid and id
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Failed to delete flow');
       throw err;
@@ -145,14 +145,14 @@ export function useWorkflowList() {
   };
 
   useEffect(() => {
-    loadWorkflows();
+    loadFlows();
   }, []);
 
   return {
-    workflows,
+    flows,
     loading,
     error,
-    loadWorkflows,
-    deleteWorkflow,
+    loadFlows,
+    deleteFlow,
   };
 }

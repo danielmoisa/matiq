@@ -70,10 +70,10 @@ export default function DashboardPage() {
 
               <div className="mt-8">
                 <Link
-                  href="/workflows"
+                  href="/flows"
                   className="bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-2 px-4 rounded"
                 >
-                  Go to Workflows
+                  Go to Flows
                 </Link>
               </div>
             </div>

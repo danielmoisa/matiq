@@ -1,9 +1,9 @@
 'use client';
 
-import { WorkflowNode, NodeType } from '@/types/workflow';
+import { FlowNode, NodeType } from '@/types/flow';
 
 interface PropertiesPanelProps {
-  node: WorkflowNode | null;
+  node: FlowNode | null;
   onUpdateNode: (nodeId: string, data: Record<string, unknown>) => void;
 }
 
@@ -96,7 +96,7 @@ export default function PropertiesPanel({ node, onUpdateNode }: PropertiesPanelP
             Copy
           </button>
         </div>
-        <p className="text-xs text-gray-500 mt-1">This URL will trigger your workflow when called</p>
+        <p className="text-xs text-gray-500 mt-1">This URL will trigger your flow when called</p>
       </div>
       <div>
         <label className="block text-sm font-medium text-gray-700 mb-2">HTTP Method</label>

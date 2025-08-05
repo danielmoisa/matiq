@@ -45,10 +45,10 @@ export function AppLayout({ children, showAuthButtons = true }: AppLayoutProps) 
                       Dashboard
                     </Link>
                     <Link
-                      href="/workflows"
+                      href="/flows"
                       className="text-gray-700 hover:text-gray-900 font-medium transition-colors"
                     >
-                      Workflows
+                      Flows
                     </Link>
                     <Link
                       href="/profile"

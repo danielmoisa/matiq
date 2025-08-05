@@ -1,12 +1,12 @@
 import { apiClient } from './api-client';
 import { 
   Flow, 
-  WorkflowNode, 
+  FlowNode, 
   Connection, 
   FlowBackend,
   convertBackendToFrontend,
   convertFrontendToBackendRequest
-} from '@/types/workflow';
+} from '@/types/flow';
 
 // Flow API Service (renamed from WorkflowService for consistency)
 export class FlowService {
@@ -49,7 +49,7 @@ export class FlowService {
   // Create a new flow
   static async createFlow(
     flow: Partial<Flow>, 
-    nodes: WorkflowNode[] = [], 
+    nodes: FlowNode[] = [], 
     connections: Connection[] = []
   ): Promise<Flow> {
     try {
@@ -72,7 +72,7 @@ export class FlowService {
   static async updateFlow(
     flowId: string, 
     flow: Partial<Flow>,
-    nodes: WorkflowNode[] = [],
+    nodes: FlowNode[] = [],
     connections: Connection[] = []
   ): Promise<Flow> {
     try {
@@ -131,7 +131,7 @@ export class FlowService {
   // Save flow (nodes and connections) - this is an alias for updateFlow
   static async saveFlow(
     flowId: string, 
-    nodes: WorkflowNode[], 
+    nodes: FlowNode[], 
     connections: Connection[]
   ): Promise<Flow> {
     try {
@@ -170,7 +170,7 @@ export class FlowService {
 
   static async createWorkflow(
     workflow: Partial<Flow>, 
-    nodes: WorkflowNode[] = [], 
+    nodes: FlowNode[] = [], 
     connections: Connection[] = []
   ): Promise<Flow> {
     return this.createFlow(workflow, nodes, connections);
@@ -179,7 +179,7 @@ export class FlowService {
   static async updateWorkflow(
     workflowId: string, 
     workflow: Partial<Flow>,
-    nodes: WorkflowNode[] = [],
+    nodes: FlowNode[] = [],
     connections: Connection[] = []
   ): Promise<Flow> {
     return this.updateFlow(workflowId, workflow, nodes, connections);
@@ -198,12 +198,10 @@ export class FlowService {
 
   static async saveWorkflow(
     workflowId: string, 
-    nodes: WorkflowNode[], 
+    nodes: FlowNode[], 
     connections: Connection[]
   ): Promise<Flow> {
     return this.saveFlow(workflowId, nodes, connections);
   }
 }
 
-// Legacy alias for backward compatibility
-export class WorkflowService extends FlowService {}

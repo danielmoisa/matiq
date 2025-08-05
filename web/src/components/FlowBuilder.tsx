@@ -1,33 +1,34 @@
 'use client';
 
 import { useState } from 'react';
-import { useWorkflow } from '@/hooks/useWorkflow';
 import PropertiesPanel from './PropertiesPanel';
-import { WorkflowNode, TriggerType, EventType } from '@/types/workflow';
-import WorkflowHeader from './WorkflowHeader';
+
 import Sidebar from './Sidebar';
 import Canvas from './Canvas';
+import { EventType, FlowNode, TriggerType } from '@/types/flow';
+import FlowHeader from './FlowHeader';
+import { useFlow } from '@/hooks/useFlow';
 
-interface WorkflowBuilderProps {
-  workflowId?: string;
+interface FlowBuilderProps {
+  flowId?: string;
 }
 
-export default function WorkflowBuilder({ workflowId }: WorkflowBuilderProps) {
+export default function FlowBuilder({ flowId }: FlowBuilderProps) {
   const {
-    workflow,
+    flow,
     nodes,
     setNodes,
     connections,
     setConnections,
     loading,
     error,
-    saveWorkflow
-  } = useWorkflow(workflowId);
+    saveFlow
+  } = useFlow(flowId);
 
-  const [selectedNode, setSelectedNode] = useState<WorkflowNode | null>(null);
+  const [selectedNode, setSelectedNode] = useState<FlowNode | null>(null);
 
   const addNode = (type: EventType, triggerType?: TriggerType) => {
-    const newNode: WorkflowNode = {
+    const newNode: FlowNode = {
       id: Date.now().toString(),
       type,
       triggerType,
@@ -67,12 +68,12 @@ export default function WorkflowBuilder({ workflowId }: WorkflowBuilderProps) {
           </div>
         </div>
       )}
-      <WorkflowHeader 
-        workflowName={workflow?.name}
-        onSave={saveWorkflow}
+      <FlowHeader 
+        flowName={flow?.name}
+        onSave={saveFlow}
         onPublish={() => {
           // TODO: Implement publish functionality
-          console.log('Publishing workflow...');
+          console.log('Publishing flow...');
         }}
         saving={loading}
       />

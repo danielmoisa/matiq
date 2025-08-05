@@ -17,7 +17,6 @@ const handler = NextAuth({
         }
 
         try {
-          // Call your Go backend login API
           const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/v1/auth/login`, {
             method: 'POST',
             headers: {
@@ -32,7 +31,6 @@ const handler = NextAuth({
           const data: LoginResponse = await response.json()
 
           if (response.ok && data.success && data.data) {
-            // Return user object that will be stored in the session
             return {
               id: data.data.user.id,
               name: data.data.user.username,

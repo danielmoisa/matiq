@@ -1,7 +1,7 @@
 'use client';
 
 import { useRef, useState} from 'react';
-import { WorkflowNode, Connection } from '@/types/workflow';
+import { FlowNode, Connection } from '@/types/flow';
 import NodeComponent from './NodeComponent';
 import {
   DndContext,
@@ -15,12 +15,12 @@ import {
 import { restrictToWindowEdges } from '@dnd-kit/modifiers';
 
 interface CanvasProps {
-  nodes: WorkflowNode[];
-  setNodes: (nodes: WorkflowNode[]) => void;
+  nodes: FlowNode[];
+  setNodes: (nodes: FlowNode[]) => void;
   connections: Connection[];
   setConnections: (connections: Connection[]) => void;
-  selectedNode: WorkflowNode | null;
-  setSelectedNode: (node: WorkflowNode | null) => void;
+  selectedNode: FlowNode | null;
+  setSelectedNode: (node: FlowNode | null) => void;
 }
 
 export default function Canvas({ 
@@ -67,7 +67,7 @@ export default function Canvas({
     // Only update if there was actual movement
     if (delta.x !== 0 || delta.y !== 0) {
       // Update node position immediately - no animation, no delay
-      const updatedNodes = nodes.map((node: WorkflowNode) => 
+      const updatedNodes = nodes.map((node: FlowNode) => 
         node.id === active.id 
           ? { 
               ...node, 
@@ -303,7 +303,7 @@ export default function Canvas({
             <div className="absolute inset-0 flex items-center justify-center">
               <div className="text-center text-gray-500">
                 <div className="text-6xl mb-4">⚡</div>
-                <h3 className="text-xl font-medium mb-2">Build Your First Workflow</h3>
+                <h3 className="text-xl font-medium mb-2">Build Your First Flow</h3>
                 <p className="text-sm">Start by adding a trigger from the sidebar</p>
               </div>
             </div>

@@ -2,19 +2,19 @@
 
 import Link from 'next/link';
 
-interface WorkflowHeaderProps {
-  workflowName?: string;
+interface FlowHeaderProps {
+  flowName?: string;
   onSave?: () => void;
   onPublish?: () => void;
   saving?: boolean;
 }
 
-export default function WorkflowHeader({ 
-  workflowName,
+export default function FlowHeader({ 
+  flowName,
   onSave,
   onPublish,
   saving = false
-}: WorkflowHeaderProps) {
+}: FlowHeaderProps) {
 
   return (
     <div className="bg-white border-b border-gray-200 px-6 py-4">
@@ -23,13 +23,13 @@ export default function WorkflowHeader({
           <div className="flex items-center space-x-2 text-sm text-gray-500">
             <Link href="/" className="hover:text-gray-700">Home</Link>
             <span>›</span>
-            <Link href="/workflows" className="hover:text-gray-700">Workflows</Link>
+            <Link href="/flows" className="hover:text-gray-700">Flows</Link>
             <span>›</span>
             <span>Edit</span>
           </div>
           <div className="h-6 w-px bg-gray-300" />
           <h2 className="text-lg font-medium text-gray-900">
-            {workflowName || 'Untitled Workflow'}
+            {flowName || 'Untitled Flow'}
           </h2>
         </div>
         

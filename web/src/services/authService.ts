@@ -114,26 +114,3 @@ export const authService = {
     return response.json()
   },
 }
-
-// Workflow service functions
-export const workflowService = {
-  // Create a new workflow
-  async createWorkflow(teamId: string, workflowData: Record<string, unknown>) {
-    return authService.post(`/api/v1/teams/${teamId}/workflow`, workflowData)
-  },
-
-  // Get a specific workflow
-  async getWorkflow(teamId: string, workflowId: string) {
-    return authService.get(`/api/v1/teams/${teamId}/workflow/${workflowId}`)
-  },
-
-  // Update a workflow
-  async updateWorkflow(teamId: string, workflowId: string, workflowData: Record<string, unknown>) {
-    return authService.put(`/api/v1/teams/${teamId}/workflow/${workflowId}`, workflowData)
-  },
-
-  // Delete a workflow
-  async deleteWorkflow(teamId: string, workflowId: string) {
-    return authService.delete(`/api/v1/teams/${teamId}/workflow/${workflowId}`)
-  },
-}
