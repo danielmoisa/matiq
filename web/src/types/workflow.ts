@@ -1,28 +1,61 @@
 export enum NodeType {
-  // Triggers
-  SCHEDULE = 'schedule',
-  WEBHOOK = 'webhook',
-  
-  // Databases
-  POSTGRES = 'postgres',
-  MYSQL = 'mysql',
-  MARIADB = 'mariadb',
-  TIDB = 'tidb',
-  NEON = 'neon',
-  MONGODB = 'mongodb',
-  SNOWFLAKE = 'snowflake',
-  SUPABASE = 'supabase',
-  CLICKHOUSE = 'clickhouse',
-  HYDRA = 'hydra',
+  // Virtual/Local Actions
+  TRANSFORMER = 'transformer',
   
   // APIs
-  REST_API = 'rest-api',
+  RESTAPI = 'restapi',
   GRAPHQL = 'graphql',
   
-  // Actions
-  AI_AGENT = 'ai-agent',
-  TRANSFORMER = 'transformer',
+  // Cache/Messaging
+  REDIS = 'redis',
+  UPSTASH = 'upstash',
+  
+  // Databases
+  MYSQL = 'mysql',
+  MARIADB = 'mariadb',
+  POSTGRESQL = 'postgresql',
+  MONGODB = 'mongodb',
+  TIDB = 'tidb',
+  ELASTICSEARCH = 'elasticsearch',
+  SUPABASEDB = 'supabasedb',
+  FIREBASE = 'firebase',
+  CLICKHOUSE = 'clickhouse',
+  MSSQL = 'mssql',
+  DYNAMODB = 'dynamodb',
+  SNOWFLAKE = 'snowflake',
+  COUCHDB = 'couchdb',
+  ORACLE = 'oracle',
+  ORACLE_9I = 'oracle9i',
+  NEON = 'neon',
+  HYDRA = 'hydra',
+  
+  // Storage
+  S3 = 's3',
+  
+  // Communication
+  SMTP = 'smtp',
+  
+  // AI/ML
+  HUGGINGFACE = 'huggingface',
+  HFENDPOINT = 'hfendpoint',
+  AI_AGENT = 'aiagent',
+  
+  // External Services
+  GOOGLESHEETS = 'googlesheets',
+  AIRTABLE = 'airtable',
+  APPWRITE = 'appwrite',
+  
+  // Workflow Control
+  TRIGGER = 'trigger',
+  SERVER_SIDE_TRANSFORMER = 'serversidetransformer',
   CONDITION = 'condition',
+  WEBHOOK_RESPONSE = 'webhookresponse',
+  WF_DRIVE = 'wfdrive',
+  
+  // Legacy - keeping for backward compatibility
+  SCHEDULE = 'schedule',
+  WEBHOOK = 'webhook',
+  REST_API = 'rest-api',
   LOOP = 'loop',
   RESPONSE = 'response',
   ERROR_HANDLER = 'error-handler'
@@ -52,34 +85,36 @@ export interface Connection {
   targetId: string;
 }
 
+// Backend node structure from API response
+interface BackendNode {
+  id?: string;
+  'action_type,'?: string;
+  action_type?: string;
+  type?: string;
+  triggerType?: string;
+  position?: { x: number; y: number };
+  data?: Record<string, unknown>;
+  connections?: string[];
+}
+
 // Backend response structure (matches actual Go backend response)
-export interface WorkflowBackend {
-  workflowID: string;           // Main workflow ID (from JSON tag)
+export interface FlowBackend {
   uid: string;                  // UUID from backend
-  teamID: string;               // Encoded team ID
-  version: number;              // Version number
   resourceID?: string;          // Encoded resource ID (optional field)
-  displayName: string;          // Workflow name
-  workflowType: string;         // Workflow type as string
-  isVirtualResource: boolean;   // Virtual resource flag
-  template: {                    // Template containing nodes and connections
-    nodes?: WorkflowNode[];
-    connections?: Connection[];
-    resourceID?: number;
-    runByAnonymous?: boolean;
-    teamID?: number;
-  };
+  displayName: string;          // Flow name
+  actionType: string;           // Flow type as string
+  template: Record<string, unknown>;  // Raw template data from backend (map[string]interface{})
   transformer: unknown;         // Transformer data (can be null)
   triggerMode: string;          // Trigger mode as string
   config: unknown;              // Config data (can be null)
   createdAt: string;            // ISO timestamp
-  createdBy: string;            // Encoded user ID
+  createdBy: string;            // User ID who created
   updatedAt: string;            // ISO timestamp
-  updatedBy: string;            // Encoded user ID
+  updatedBy: string;            // User ID who updated
 }
 
-// Frontend-friendly workflow interface (converted from backend)
-export interface Workflow {
+// Frontend-friendly flow interface (converted from backend)
+export interface Flow {
   id: string;                   // Use resourceID as string
   name: string;
   description?: string;
@@ -92,14 +127,16 @@ export interface Workflow {
   updatedAt: string;
   // Backend fields for API calls
   uid?: string;
-  teamID?: string;
-  version?: number;
   resourceID?: string;
-  workflowType?: string;
+  actionType?: string;
 }
 
+// Legacy alias for backward compatibility
+export type Workflow = Flow;
+export type WorkflowBackend = FlowBackend;
+
 // Template structure stored in backend template field
-interface WorkflowTemplate {
+interface FlowTemplate {
   nodes?: WorkflowNode[];
   connections?: Connection[];
   resourceID?: number;
@@ -107,13 +144,14 @@ interface WorkflowTemplate {
   teamID?: number;
 }
 
-// Convert backend workflow to frontend workflow
-export function convertBackendToFrontend(backend: WorkflowBackend | null | undefined): Workflow {
+
+// Convert backend flow to frontend flow
+export function convertBackendToFrontend(backend: FlowBackend | null | undefined): Flow {
   // Handle undefined/null backend response
   if (!backend) {
     return {
       id: 'unknown',
-      name: 'Unknown Workflow',
+      name: 'Unknown Flow',
       description: '',
       nodes: [],
       connections: [],
@@ -128,9 +166,28 @@ export function convertBackendToFrontend(backend: WorkflowBackend | null | undef
   let nodes: WorkflowNode[] = [];
   let connections: Connection[] = [];
 
-  if (backend.template) {
-    nodes = backend.template.nodes || [];
-    connections = backend.template.connections || [];
+  if (backend.template && typeof backend.template === 'object') {
+    // Safely access template data as it comes from backend as map[string]interface{}
+    const templateData = backend.template;
+    
+    // Transform backend nodes to frontend format
+    if (Array.isArray(templateData.nodes)) {
+      nodes = templateData.nodes.map((backendNode: BackendNode) => {
+        // Handle the backend node structure which uses action_type, (with comma)
+        const nodeType = backendNode['action_type,'] || backendNode.action_type || backendNode.type || 'unknown';
+        
+        return {
+          id: backendNode.id || 'unknown',
+          type: nodeType,
+          triggerType: backendNode.triggerType,
+          position: backendNode.position || { x: 0, y: 0 },
+          data: backendNode.data || {},
+          connections: backendNode.connections || []
+        } as WorkflowNode;
+      });
+    }
+    
+    connections = Array.isArray(templateData.connections) ? templateData.connections as Connection[] : [];
   }
 
   // Determine status based on template and trigger mode
@@ -140,8 +197,8 @@ export function convertBackendToFrontend(backend: WorkflowBackend | null | undef
   }
 
   return {
-    id: backend.workflowID || backend.resourceID || backend.uid || 'unknown', // Use workflowID first
-    name: backend.displayName || 'Untitled Workflow',
+    id: backend.resourceID || backend.uid || 'unknown', 
+    name: backend.displayName || 'Untitled Flow',
     description: "", // Backend does not have description field
     nodes,
     connections,
@@ -152,37 +209,35 @@ export function convertBackendToFrontend(backend: WorkflowBackend | null | undef
     updatedAt: backend.updatedAt || new Date().toISOString(),
     // Keep backend fields for API calls
     uid: backend.uid,
-    teamID: backend.teamID,
-    version: backend.version,
     resourceID: backend.resourceID,
-    workflowType: backend.workflowType,
+    actionType: backend.actionType,
   };
 }
 
-// Convert frontend workflow to backend create/update request
+// Convert frontend flow to backend create/update request
 export function convertFrontendToBackendRequest(
-  workflow: Partial<Workflow>,
+  flow: Partial<Flow>,
   nodes: WorkflowNode[] = [],
   connections: Connection[] = []
 ): {
   displayName: string;
-  workflowType: string;
+  actionType: string;
   triggerMode: string;
-  template: WorkflowTemplate;
+  template: FlowTemplate;
   transformer?: unknown;
   config?: unknown;
 } {
   // Create template object from nodes and connections
-  const template: WorkflowTemplate = {
+  const template: FlowTemplate = {
     nodes,
     connections,
     runByAnonymous: true,
   };
 
   return {
-    displayName: workflow.name || "Untitled Workflow",
-    workflowType: workflow.workflowType || "restapi",
-    triggerMode: workflow.triggerMode || "1", // Backend expects string
+    displayName: flow.name || "Untitled Flow",
+    actionType: flow.actionType || "restapi",
+    triggerMode: flow.triggerMode || "1", // Backend expects string
     template,
     transformer: null,
     config: null,

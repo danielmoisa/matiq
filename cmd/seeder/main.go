@@ -74,56 +74,56 @@ func seedFlows(db *gorm.DB) error {
 	transformer := `{"enable": false, "rawData": ""}`
 
 	template := `{
-        "resourceID": 123,
-        "runByAnonymous": true,
-        "teamID": 1,
-        "nodes": [
-            {
-                "id": "trigger-1",
-                "action_type,": "webhook",
-                "triggerType": "webhook",
-                "position": {"x": 100, "y": 100},
-                "data": {
-                    "name": "Webhook Trigger",
-                    "description": "Receives incoming HTTP requests",
-                    "webhookUrl": "/api/webhooks/flow-123",
-                    "method": "POST",
-                    "headers": {"Content-Type": "application/json"}
-                }
-            },
-            {
-                "id": "postgres-1",
-                "action_type,": "postgresql",
-                "position": {"x": 300, "y": 100},
-                "data": {
-                    "name": "Database Query",
-                    "description": "Query user data from PostgreSQL",
-                    "mode": "sql",
-                    "query": "SELECT * FROM users WHERE email = '{{trigger.body.email}}';",
-                    "resourceID": "postgres-resource-1"
-                },
-                "connections": ["trigger-1"]
-            },
-            {
-                "id": "transformer-1",
-                "action_type,": "transformer",
-                "position": {"x": 500, "y": 100},
-                "data": {
-                    "name": "Data Transformer",
-                    "description": "Transform user data for response",
-                    "code": "const transformedData = { userId: data.postgres_1[0]?.id, fullName: data.postgres_1[0]?.first_name + ' ' + data.postgres_1[0]?.last_name, email: data.postgres_1[0]?.email, isActive: data.postgres_1[0]?.status === 'active' }; return transformedData;",
-                    "language": "javascript"
-                },
-                "connections": ["postgres-1"]
-            }
-        ],
-        "connections": [
-            {"id": "conn-1", "sourceId": "trigger-1", "targetId": "postgres-1"},
-            {"id": "conn-2", "sourceId": "postgres-1", "targetId": "transformer-1"}
-        ],
-        "virtualResource": {"icon": "database", "category": "data-processing"},
-        "metadata": {"version": "1.0.0", "description": "User validation flow"}
-    }`
+		"resourceID": 123,
+		"runByAnonymous": true,
+		"teamID": 1,
+		"nodes": [
+			{
+				"id": "trigger-1",
+				"type": "webhook",
+				"triggerType": "webhook",
+				"position": {"x": 100, "y": 100},
+				"data": {
+					"name": "Webhook Trigger",
+					"description": "Receives incoming HTTP requests",
+					"webhookUrl": "/api/webhooks/workflow-123",
+					"method": "POST",
+					"headers": {"Content-Type": "application/json"}
+				}
+			},
+			{
+				"id": "postgres-1",
+				"type": "postgresql",
+				"position": {"x": 300, "y": 100},
+				"data": {
+					"name": "Database Query",
+					"description": "Query user data from PostgreSQL",
+					"mode": "sql",
+					"query": "SELECT * FROM users WHERE email = '{{trigger.body.email}}';",
+					"resourceID": "postgres-resource-1"
+				},
+				"connections": ["trigger-1"]
+			},
+			{
+				"id": "transformer-1",
+				"type": "transformer",
+				"position": {"x": 500, "y": 100},
+				"data": {
+					"name": "Data Transformer",
+					"description": "Transform user data for response",
+					"code": "const transformedData = { userId: data.postgres_1[0]?.id, fullName: data.postgres_1[0]?.first_name + ' ' + data.postgres_1[0]?.last_name, email: data.postgres_1[0]?.email, isActive: data.postgres_1[0]?.status === 'active' }; return transformedData;",
+					"language": "javascript"
+				},
+				"connections": ["postgres-1"]
+			}
+		],
+		"connections": [
+			{"id": "conn-1", "sourceId": "trigger-1", "targetId": "postgres-1"},
+			{"id": "conn-2", "sourceId": "postgres-1", "targetId": "transformer-1"}
+		],
+		"virtualResource": {"icon": "database", "category": "data-processing"},
+		"metadata": {"version": "1.0.0", "description": "User validation workflow"}
+	}`
 
 	config := `{"public": false, "advancedConfig": {"runtime": "none", "pages": [], "delayWhenLoaded": "", "displayLoadingPage": false, "isPeriodically": false, "periodInterval": ""}}`
 

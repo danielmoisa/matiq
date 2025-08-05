@@ -21,6 +21,9 @@ export default function PropertiesPanel({ node, onUpdateNode }: PropertiesPanelP
   }
 
   const formatTitle = (type: string) => {
+    if (!type || typeof type !== 'string') {
+      return 'Unknown Node';
+    }
     return type.split('-').map(word => word.charAt(0).toUpperCase() + word.slice(1)).join(' ');
   };
 
@@ -194,27 +197,69 @@ function transform(input) {
   const renderConfig = () => {
     switch (node.type) {
       case NodeType.WEBHOOK:
+      case NodeType.TRIGGER:
         return renderWebhookConfig();
       case NodeType.SCHEDULE:
         return renderScheduleConfig();
-      case NodeType.POSTGRES:
+      case NodeType.POSTGRESQL:
       case NodeType.MYSQL:
       case NodeType.MARIADB:
       case NodeType.TIDB:
       case NodeType.NEON:
       case NodeType.MONGODB:
       case NodeType.SNOWFLAKE:
-      case NodeType.SUPABASE:
+      case NodeType.SUPABASEDB:
       case NodeType.CLICKHOUSE:
       case NodeType.HYDRA:
+      case NodeType.MSSQL:
+      case NodeType.ORACLE:
+      case NodeType.ORACLE_9I:
+      case NodeType.ELASTICSEARCH:
+      case NodeType.FIREBASE:
+      case NodeType.DYNAMODB:
+      case NodeType.COUCHDB:
         return renderDatabaseConfig();
       case NodeType.REST_API:
+      case NodeType.RESTAPI:
       case NodeType.GRAPHQL:
         return renderAPIConfig();
       case NodeType.TRANSFORMER:
+      case NodeType.SERVER_SIDE_TRANSFORMER:
         return renderTransformerConfig();
       case NodeType.CONDITION:
         return renderConditionConfig();
+      case NodeType.AI_AGENT:
+      case NodeType.HUGGINGFACE:
+      case NodeType.HFENDPOINT:
+        return (
+          <div className="text-sm text-gray-500">
+            AI/ML configuration options coming soon...
+          </div>
+        );
+      case NodeType.S3:
+      case NodeType.REDIS:
+      case NodeType.UPSTASH:
+      case NodeType.WF_DRIVE:
+        return (
+          <div className="text-sm text-gray-500">
+            Storage configuration options coming soon...
+          </div>
+        );
+      case NodeType.SMTP:
+      case NodeType.WEBHOOK_RESPONSE:
+        return (
+          <div className="text-sm text-gray-500">
+            Communication configuration options coming soon...
+          </div>
+        );
+      case NodeType.GOOGLESHEETS:
+      case NodeType.AIRTABLE:
+      case NodeType.APPWRITE:
+        return (
+          <div className="text-sm text-gray-500">
+            External service configuration options coming soon...
+          </div>
+        );
       default:
         return (
           <div className="text-sm text-gray-500">

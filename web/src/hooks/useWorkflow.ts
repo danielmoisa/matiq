@@ -2,15 +2,15 @@ import { useState, useEffect } from 'react';
 import { Workflow, WorkflowNode, Connection } from '@/types/workflow';
 import { WorkflowService } from '@/services/workflow-service';
 
-// Hook for managing workflow state
+// Hook for managing flow state
 export function useWorkflow(workflowId?: string) {
-  const [workflow, setWorkflow] = useState<Workflow | null>(null);
+  const [flow, setWorkflow] = useState<Workflow | null>(null);
   const [nodes, setNodes] = useState<WorkflowNode[]>([]);
   const [connections, setConnections] = useState<Connection[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  // Load workflow data
+  // Load flow data
   const loadWorkflow = async (id: string) => {
     setLoading(true);
     setError(null);
@@ -20,7 +20,7 @@ export function useWorkflow(workflowId?: string) {
       setNodes(workflowData.nodes || []);
       setConnections(workflowData.connections || []);
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Failed to load workflow');
+      setError(err instanceof Error ? err.message : 'Failed to load flow');
       setNodes([]);
       setConnections([]);
     } finally {
@@ -28,27 +28,27 @@ export function useWorkflow(workflowId?: string) {
     }
   };
 
-  // Save workflow changes
+  // Save flow changes
   const saveWorkflow = async () => {
-    if (!workflow) return;
+    if (!flow) return;
     
     setLoading(true);
     setError(null);
     try {
       const updatedWorkflow = await WorkflowService.saveWorkflow(
-        workflow.uid || workflow.id, // Use UUID first, fallback to id
+        flow.uid || flow.id, // Use UUID first, fallback to id
         nodes,
         connections
       );
       setWorkflow(updatedWorkflow);
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Failed to save workflow');
+      setError(err instanceof Error ? err.message : 'Failed to save flow');
     } finally {
       setLoading(false);
     }
   };
 
-  // Create new workflow
+  // Create new flow
   const createWorkflow = async (name: string, description?: string) => {
     setLoading(true);
     setError(null);
@@ -64,50 +64,32 @@ export function useWorkflow(workflowId?: string) {
       setConnections([]);
       return newWorkflow;
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Failed to create workflow');
+      setError(err instanceof Error ? err.message : 'Failed to create flow');
       throw err;
     } finally {
       setLoading(false);
     }
   };
 
-  // Execute workflow
+  // Execute flow
   const executeWorkflow = async (input?: Record<string, unknown>) => {
-    if (!workflow) return;
+    if (!flow) return;
     
     setLoading(true);
     setError(null);
     try {
-      const result = await WorkflowService.executeWorkflow(workflow.id, input);
+      const result = await WorkflowService.executeWorkflow(flow.id, input);
       return result;
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Failed to execute workflow');
+      setError(err instanceof Error ? err.message : 'Failed to execute flow');
       throw err;
     } finally {
       setLoading(false);
     }
   };
 
-  // Toggle workflow active status
-  const toggleActive = async () => {
-    if (!workflow) return;
-    
-    setLoading(true);
-    setError(null);
-    try {
-      const updatedWorkflow = await WorkflowService.toggleWorkflowStatus(
-        workflow.id,
-        !workflow.isActive
-      );
-      setWorkflow(updatedWorkflow);
-    } catch (err) {
-      setError(err instanceof Error ? err.message : 'Failed to update workflow status');
-    } finally {
-      setLoading(false);
-    }
-  };
 
-  // Load workflow on mount if ID provided
+  // Load flow on mount if ID provided
   useEffect(() => {
     if (workflowId) {
       loadWorkflow(workflowId);
@@ -115,7 +97,7 @@ export function useWorkflow(workflowId?: string) {
   }, [workflowId]);
 
   return {
-    workflow,
+    flow,
     nodes,
     setNodes,
     connections,
@@ -126,11 +108,10 @@ export function useWorkflow(workflowId?: string) {
     saveWorkflow,
     createWorkflow,
     executeWorkflow,
-    toggleActive,
   };
 }
 
-// Hook for managing workflow list
+// Hook for managing flow list
 export function useWorkflowList() {
   const [workflows, setWorkflows] = useState<Workflow[]>([]);
   const [loading, setLoading] = useState(false);
@@ -156,7 +137,7 @@ export function useWorkflowList() {
       await WorkflowService.deleteWorkflow(id);
       setWorkflows(prev => prev.filter(w => w.uid !== id && w.id !== id)); // Filter by both uid and id
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Failed to delete workflow');
+      setError(err instanceof Error ? err.message : 'Failed to delete flow');
       throw err;
     } finally {
       setLoading(false);

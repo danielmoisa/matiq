@@ -14,23 +14,63 @@ interface NodeComponentProps {
 
 const getNodeIcon = (type: string) => {
   const icons: Record<string, string> = {
-    [NodeType.SCHEDULE]: '⏰',
-    [NodeType.WEBHOOK]: '🔗',
-    [NodeType.POSTGRES]: '🐘',
+    // Virtual/Local Actions
+    [NodeType.TRANSFORMER]: '⚙️',
+    
+    // APIs
+    [NodeType.RESTAPI]: '🌐',
+    [NodeType.GRAPHQL]: '📋',
+    
+    // Cache/Messaging
+    [NodeType.REDIS]: '�',
+    [NodeType.UPSTASH]: '⚡',
+    
+    // Databases
     [NodeType.MYSQL]: '🐬',
     [NodeType.MARIADB]: '🗃️',
-    [NodeType.TIDB]: '⚡',
-    [NodeType.NEON]: '🌟',
+    [NodeType.POSTGRESQL]: '🐘',
     [NodeType.MONGODB]: '🍃',
-    [NodeType.SNOWFLAKE]: '❄️',
-    [NodeType.SUPABASE]: '⚡',
+    [NodeType.TIDB]: '⚡',
+    [NodeType.ELASTICSEARCH]: '🔍',
+    [NodeType.SUPABASEDB]: '⚡',
+    [NodeType.FIREBASE]: '🔥',
     [NodeType.CLICKHOUSE]: '📊',
+    [NodeType.MSSQL]: '🗄️',
+    [NodeType.DYNAMODB]: '🟡',
+    [NodeType.SNOWFLAKE]: '❄️',
+    [NodeType.COUCHDB]: '🛋️',
+    [NodeType.ORACLE]: '🔷',
+    [NodeType.ORACLE_9I]: '🔷',
+    [NodeType.NEON]: '🌟',
     [NodeType.HYDRA]: '🐍',
-    [NodeType.REST_API]: '🌐',
-    [NodeType.GRAPHQL]: '📋',
+    
+    // Storage
+    [NodeType.S3]: '☁️',
+    
+    // Communication
+    [NodeType.SMTP]: '📧',
+    
+    // AI/ML
+    [NodeType.HUGGINGFACE]: '🤗',
+    [NodeType.HFENDPOINT]: '🤖',
     [NodeType.AI_AGENT]: '🤖',
-    [NodeType.TRANSFORMER]: '⚙️',
+    
+    // External Services
+    [NodeType.GOOGLESHEETS]: '📊',
+    [NodeType.AIRTABLE]: '📋',
+    [NodeType.APPWRITE]: '📱',
+    
+    // Workflow Control
+    [NodeType.TRIGGER]: '🎯',
+    [NodeType.SERVER_SIDE_TRANSFORMER]: '⚙️',
     [NodeType.CONDITION]: '🔀',
+    [NodeType.WEBHOOK_RESPONSE]: '📤',
+    [NodeType.WF_DRIVE]: '💾',
+    
+    // Legacy - keeping for backward compatibility
+    [NodeType.SCHEDULE]: '⏰',
+    [NodeType.WEBHOOK]: '🔗',
+    [NodeType.REST_API]: '🌐',
     [NodeType.LOOP]: '🔄',
     [NodeType.RESPONSE]: '📤',
     [NodeType.ERROR_HANDLER]: '⚠️',
@@ -39,13 +79,43 @@ const getNodeIcon = (type: string) => {
 };
 
 const getNodeColor = (type: string) => {
-  if ([NodeType.SCHEDULE, NodeType.WEBHOOK].includes(type as NodeType)) return 'bg-green-100 border-green-300 text-green-800';
-  if ([NodeType.POSTGRES, NodeType.MYSQL, NodeType.MARIADB, NodeType.TIDB, NodeType.NEON, NodeType.MONGODB, NodeType.SNOWFLAKE, NodeType.SUPABASE, NodeType.CLICKHOUSE, NodeType.HYDRA].includes(type as NodeType)) return 'bg-blue-100 border-blue-300 text-blue-800';
-  if ([NodeType.REST_API, NodeType.GRAPHQL].includes(type as NodeType)) return 'bg-purple-100 border-purple-300 text-purple-800';
+  // Triggers and Workflow Control
+  if ([NodeType.SCHEDULE, NodeType.WEBHOOK, NodeType.TRIGGER].includes(type as NodeType)) 
+    return 'bg-green-100 border-green-300 text-green-800';
+  
+  // Databases
+  if ([NodeType.POSTGRESQL, NodeType.MYSQL, NodeType.MARIADB, NodeType.TIDB, NodeType.NEON, 
+       NodeType.MONGODB, NodeType.SNOWFLAKE, NodeType.SUPABASEDB, NodeType.CLICKHOUSE, 
+       NodeType.HYDRA, NodeType.ELASTICSEARCH, NodeType.FIREBASE, NodeType.MSSQL, 
+       NodeType.DYNAMODB, NodeType.COUCHDB, NodeType.ORACLE, NodeType.ORACLE_9I].includes(type as NodeType)) 
+    return 'bg-blue-100 border-blue-300 text-blue-800';
+  
+  // APIs
+  if ([NodeType.REST_API, NodeType.RESTAPI, NodeType.GRAPHQL].includes(type as NodeType)) 
+    return 'bg-purple-100 border-purple-300 text-purple-800';
+  
+  // AI/ML
+  if ([NodeType.AI_AGENT, NodeType.HUGGINGFACE, NodeType.HFENDPOINT].includes(type as NodeType)) 
+    return 'bg-pink-100 border-pink-300 text-pink-800';
+  
+  // Storage and Services
+  if ([NodeType.S3, NodeType.SMTP, NodeType.GOOGLESHEETS, NodeType.AIRTABLE, NodeType.APPWRITE, NodeType.WF_DRIVE].includes(type as NodeType)) 
+    return 'bg-yellow-100 border-yellow-300 text-yellow-800';
+  
+  // Cache and Messaging
+  if ([NodeType.REDIS, NodeType.UPSTASH].includes(type as NodeType)) 
+    return 'bg-red-100 border-red-300 text-red-800';
+  
+  // Workflow Actions
+  if ([NodeType.TRANSFORMER, NodeType.SERVER_SIDE_TRANSFORMER, NodeType.CONDITION, 
+       NodeType.WEBHOOK_RESPONSE, NodeType.LOOP, NodeType.RESPONSE, NodeType.ERROR_HANDLER].includes(type as NodeType)) 
+    return 'bg-indigo-100 border-indigo-300 text-indigo-800';
+  
   return 'bg-gray-100 border-gray-300 text-gray-800';
 };
 
-const formatNodeTitle = (type: string) => {
+const formatNodeTitle = (type: string | undefined) => {
+  if (!type) return '';
   return type.split('-').map(word => word.charAt(0).toUpperCase() + word.slice(1)).join(' ');
 };
 

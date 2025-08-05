@@ -10,29 +10,62 @@ interface SidebarProps {
 const triggers = [
   { type: NodeType.SCHEDULE, label: 'Schedule', icon: '⏰', description: 'Run on a schedule' },
   { type: NodeType.WEBHOOK, label: 'Webhook', icon: '🔗', description: 'Trigger via HTTP request' },
+  { type: NodeType.TRIGGER, label: 'Trigger', icon: '🎯', description: 'Generic trigger' },
 ];
 
 const databases = [
-  { type: NodeType.POSTGRES, label: 'PostgreSQL', icon: '🐘' },
+  { type: NodeType.POSTGRESQL, label: 'PostgreSQL', icon: '🐘' },
   { type: NodeType.MYSQL, label: 'MySQL', icon: '🐬' },
   { type: NodeType.MARIADB, label: 'MariaDB', icon: '🗃️' },
   { type: NodeType.TIDB, label: 'TiDB', icon: '⚡' },
   { type: NodeType.NEON, label: 'Neon', icon: '🌟' },
   { type: NodeType.MONGODB, label: 'MongoDB', icon: '🍃' },
   { type: NodeType.SNOWFLAKE, label: 'Snowflake', icon: '❄️' },
-  { type: NodeType.SUPABASE, label: 'Supabase', icon: '⚡' },
+  { type: NodeType.SUPABASEDB, label: 'Supabase DB', icon: '⚡' },
   { type: NodeType.CLICKHOUSE, label: 'ClickHouse', icon: '📊' },
   { type: NodeType.HYDRA, label: 'Hydra', icon: '🐍' },
+  { type: NodeType.MSSQL, label: 'MS SQL Server', icon: '🗄️' },
+  { type: NodeType.ORACLE, label: 'Oracle', icon: '🔷' },
+  { type: NodeType.ORACLE_9I, label: 'Oracle 9i', icon: '🔷' },
+  { type: NodeType.ELASTICSEARCH, label: 'Elasticsearch', icon: '🔍' },
+  { type: NodeType.FIREBASE, label: 'Firebase', icon: '🔥' },
+  { type: NodeType.DYNAMODB, label: 'DynamoDB', icon: '🟡' },
+  { type: NodeType.COUCHDB, label: 'CouchDB', icon: '🛋️' },
 ];
 
 const apis = [
   { type: NodeType.REST_API, label: 'REST API', icon: '🌐' },
+  { type: NodeType.RESTAPI, label: 'REST API (Backend)', icon: '🌐' },
   { type: NodeType.GRAPHQL, label: 'GraphQL', icon: '📋' },
 ];
 
-const actions = [
+const storage = [
+  { type: NodeType.S3, label: 'Amazon S3', icon: '☁️' },
+  { type: NodeType.REDIS, label: 'Redis', icon: '🔴' },
+  { type: NodeType.UPSTASH, label: 'Upstash', icon: '⚡' },
+  { type: NodeType.WF_DRIVE, label: 'Workflow Drive', icon: '💾' },
+];
+
+const communication = [
+  { type: NodeType.SMTP, label: 'SMTP Email', icon: '📧' },
+  { type: NodeType.WEBHOOK_RESPONSE, label: 'Webhook Response', icon: '📤' },
+];
+
+const ai = [
   { type: NodeType.AI_AGENT, label: 'AI Agent', icon: '🤖' },
+  { type: NodeType.HUGGINGFACE, label: 'Hugging Face', icon: '🤗' },
+  { type: NodeType.HFENDPOINT, label: 'HF Endpoint', icon: '🤖' },
+];
+
+const external = [
+  { type: NodeType.GOOGLESHEETS, label: 'Google Sheets', icon: '📊' },
+  { type: NodeType.AIRTABLE, label: 'Airtable', icon: '📋' },
+  { type: NodeType.APPWRITE, label: 'Appwrite', icon: '📱' },
+];
+
+const actions = [
   { type: NodeType.TRANSFORMER, label: 'Transformer', icon: '⚙️' },
+  { type: NodeType.SERVER_SIDE_TRANSFORMER, label: 'Server Transformer', icon: '⚙️' },
   { type: NodeType.CONDITION, label: 'Condition', icon: '🔀' },
   { type: NodeType.LOOP, label: 'Loop', icon: '🔄' },
   { type: NodeType.RESPONSE, label: 'Response', icon: '📤' },
@@ -40,7 +73,7 @@ const actions = [
 ];
 
 export default function Sidebar({ onAddNode }: SidebarProps) {
-  const [activeTab, setActiveTab] = useState<'triggers' | 'databases' | 'apis' | 'actions'>('triggers');
+  const [activeTab, setActiveTab] = useState<'triggers' | 'databases' | 'apis' | 'storage' | 'communication' | 'ai' | 'external' | 'actions'>('triggers');
 
   const renderNodeList = (nodes: { type: EventType; label: string; icon: string; description?: string }[], isTrigger = false) => (
     <div className="space-y-2">
@@ -74,17 +107,21 @@ export default function Sidebar({ onAddNode }: SidebarProps) {
         <p className="text-sm text-gray-500 mt-1">Drag and drop to build your workflow</p>
       </div>
 
-      <div className="flex border-b border-gray-200">
+      <div className="flex flex-wrap border-b border-gray-200">
         {[
           { key: 'triggers', label: 'Triggers' },
           { key: 'databases', label: 'Databases' },
           { key: 'apis', label: 'APIs' },
+          { key: 'storage', label: 'Storage' },
+          { key: 'communication', label: 'Comm' },
+          { key: 'ai', label: 'AI/ML' },
+          { key: 'external', label: 'External' },
           { key: 'actions', label: 'Actions' },
         ].map((tab) => (
           <button
             key={tab.key}
             onClick={() => setActiveTab(tab.key as typeof activeTab)}
-            className={`flex-1 px-3 py-2 text-sm font-medium border-b-2 transition-colors ${
+            className={`px-2 py-2 text-xs font-medium border-b-2 transition-colors ${
               activeTab === tab.key
                 ? 'border-blue-500 text-blue-600'
                 : 'border-transparent text-gray-500 hover:text-gray-700'
@@ -99,6 +136,10 @@ export default function Sidebar({ onAddNode }: SidebarProps) {
         {activeTab === 'triggers' && renderNodeList(triggers, true)}
         {activeTab === 'databases' && renderNodeList(databases)}
         {activeTab === 'apis' && renderNodeList(apis)}
+        {activeTab === 'storage' && renderNodeList(storage)}
+        {activeTab === 'communication' && renderNodeList(communication)}
+        {activeTab === 'ai' && renderNodeList(ai)}
+        {activeTab === 'external' && renderNodeList(external)}
         {activeTab === 'actions' && renderNodeList(actions)}
       </div>
     </aside>

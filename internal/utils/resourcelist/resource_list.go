@@ -23,15 +23,10 @@ var (
 	TYPE_COUCHDB                 = "couchdb"
 	TYPE_HFENDPOINT              = "hfendpoint"
 	TYPE_ORACLE                  = "oracle"
-	TYPE_APPWRITE                = "appwrite"
 	TYPE_GOOGLESHEETS            = "googlesheets"
 	TYPE_NEON                    = "neon"
 	TYPE_UPSTASH                 = "upstash"
 	TYPE_AIRTABLE                = "airtable"
-	TYPE_HYDRA                   = "hydra"
-	TYPE_AI_AGENT                = "aiagent"
-	TYPE_ORACLE_9I               = "oracle9i"
-	TYPE_WF_DRIVE                = "wfdrive"
 	TYPE_TRIGGER                 = "trigger"
 	TYPE_SERVER_SIDE_TRANSFORMER = "serversidetransformer"
 	TYPE_CONDITION               = "condition"
@@ -99,19 +94,14 @@ var type_array = []string{
 	19: TYPE_COUCHDB,
 	20: TYPE_HFENDPOINT,
 	21: TYPE_ORACLE,
-	22: TYPE_APPWRITE,
-	23: TYPE_GOOGLESHEETS,
-	24: TYPE_NEON,
-	25: TYPE_UPSTASH,
-	26: TYPE_AIRTABLE,
-	27: TYPE_HYDRA,
-	28: TYPE_AI_AGENT,
-	29: TYPE_ORACLE_9I,
-	30: TYPE_WF_DRIVE,
-	31: TYPE_TRIGGER,
-	32: TYPE_SERVER_SIDE_TRANSFORMER,
-	33: TYPE_CONDITION,
-	34: TYPE_WEBHOOK_RESPONSE,
+	22: TYPE_GOOGLESHEETS,
+	23: TYPE_NEON,
+	24: TYPE_UPSTASH,
+	25: TYPE_AIRTABLE,
+	30: TYPE_TRIGGER,
+	31: TYPE_SERVER_SIDE_TRANSFORMER,
+	32: TYPE_CONDITION,
+	33: TYPE_WEBHOOK_RESPONSE,
 }
 
 var type_map = map[string]int{
@@ -137,15 +127,10 @@ var type_map = map[string]int{
 	TYPE_COUCHDB:                 TYPE_COUCHDB_ID,
 	TYPE_HFENDPOINT:              TYPE_HFENDPOINT_ID,
 	TYPE_ORACLE:                  TYPE_ORACLE_ID,
-	TYPE_APPWRITE:                TYPE_APPWRITE_ID,
 	TYPE_GOOGLESHEETS:            TYPE_GOOGLESHEETS_ID,
 	TYPE_NEON:                    TYPE_NEON_ID,
 	TYPE_UPSTASH:                 TYPE_UPSTASH_ID,
 	TYPE_AIRTABLE:                TYPE_AIRTABLE_ID,
-	TYPE_HYDRA:                   TYPE_HYDRA_ID,
-	TYPE_AI_AGENT:                TYPE_AI_AGENT_ID,
-	TYPE_ORACLE_9I:               TYPE_ORACLE_9I_ID,
-	TYPE_WF_DRIVE:                TYPE_WF_DRIVE_ID,
 	TYPE_TRIGGER:                 TYPE_TRIGGER_ID,
 	TYPE_SERVER_SIDE_TRANSFORMER: TYPE_SERVER_SIDE_TRANSFORMER_ID,
 	TYPE_CONDITION:               TYPE_CONDITION_ID,
@@ -154,17 +139,10 @@ var type_map = map[string]int{
 
 var virtualResourceList = map[string]bool{
 	TYPE_TRANSFORMER: true,
-	TYPE_AI_AGENT:    true,
-	TYPE_WF_DRIVE:    true,
 }
 
 var localVirtualResourceList = map[string]bool{
 	TYPE_TRANSFORMER: true,
-}
-
-var remoteVirtualResourceList = map[string]bool{
-	TYPE_AI_AGENT: true,
-	TYPE_WF_DRIVE: true,
 }
 
 var emptyOptionResourceList = map[string]bool{
@@ -173,10 +151,6 @@ var emptyOptionResourceList = map[string]bool{
 
 var canCreateOAuthTokenResourceList = map[string]bool{
 	TYPE_GOOGLESHEETS: true,
-}
-
-var needFetchResourceInfoFromSourceManagerList = map[string]bool{
-	TYPE_AI_AGENT: true,
 }
 
 func GetResourceIDMappedType(id int) string {
@@ -198,11 +172,6 @@ func IsLocalVirtualResource(resourceType string) bool {
 	return itIs && hit
 }
 
-func IsRemoteVirtualResource(resourceType string) bool {
-	itIs, hit := remoteVirtualResourceList[resourceType]
-	return itIs && hit
-}
-
 func IsVirtualResourceByIntType(resourceType int) bool {
 	resourceTypeString := GetResourceIDMappedType(resourceType)
 	itIs, hit := virtualResourceList[resourceTypeString]
@@ -212,12 +181,6 @@ func IsVirtualResourceByIntType(resourceType int) bool {
 func IsLocalVirtualResourceByIntType(resourceType int) bool {
 	resourceTypeString := GetResourceIDMappedType(resourceType)
 	itIs, hit := localVirtualResourceList[resourceTypeString]
-	return itIs && hit
-}
-
-func IsRemoteVirtualResourceByIntType(resourceType int) bool {
-	resourceTypeString := GetResourceIDMappedType(resourceType)
-	itIs, hit := remoteVirtualResourceList[resourceTypeString]
 	return itIs && hit
 }
 
@@ -231,9 +194,4 @@ func CanCreateOAuthToken(resourceType int) bool {
 	resourceTypeString := GetResourceIDMappedType(resourceType)
 	canDo, hit := canCreateOAuthTokenResourceList[resourceTypeString]
 	return canDo && hit
-}
-
-func NeedFetchResourceInfoFromSourceManager(resourceType string) bool {
-	itIs, hit := needFetchResourceInfoFromSourceManagerList[resourceType]
-	return itIs && hit
 }

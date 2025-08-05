@@ -38,7 +38,7 @@ export default function CreateWorkflowPage() {
         status: 'draft' as const,
         isActive: false,
         triggerMode: '1', // Default trigger mode
-        workflowType: 'restapi' // Default workflow type
+        actionType: 'restapi' // Default workflow type
       };
 
       // Create the workflow
@@ -72,7 +72,7 @@ export default function CreateWorkflowPage() {
         status: 'active' as const,
         isActive: true,
         triggerMode: '1',
-        workflowType: 'restapi'
+        actionType: 'restapi'
       };
 
       // Create and publish the workflow

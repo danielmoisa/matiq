@@ -55,11 +55,3 @@ func (req *CreateFlowActionRequest) IsVirtualAction() bool {
 func (req *CreateFlowActionRequest) IsLocalVirtualAction() bool {
 	return resourcelist.IsLocalVirtualResource(req.ActionType)
 }
-
-func (req *CreateFlowActionRequest) IsRemoteVirtualAction() bool {
-	return resourcelist.IsRemoteVirtualResource(req.ActionType)
-}
-
-func (req *CreateFlowActionRequest) NeedFetchResourceInfoFromSourceManager() bool {
-	return resourcelist.NeedFetchResourceInfoFromSourceManager(req.ActionType)
-}

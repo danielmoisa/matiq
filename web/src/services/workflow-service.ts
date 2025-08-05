@@ -1,118 +1,118 @@
 import { apiClient } from './api-client';
 import { 
-  Workflow, 
+  Flow, 
   WorkflowNode, 
   Connection, 
-  WorkflowBackend,
+  FlowBackend,
   convertBackendToFrontend,
   convertFrontendToBackendRequest
 } from '@/types/workflow';
 
-// Workflow API Service
-export class WorkflowService {
+// Flow API Service (renamed from WorkflowService for consistency)
+export class FlowService {
   
-  // Get all workflows for a team
-  static async getWorkflows(): Promise<Workflow[]> { 
+  // Get all flows for a team
+  static async getFlows(): Promise<Flow[]> { 
     try {
-      const response = await apiClient.get<{ workflows: WorkflowBackend[] }>(`/api/v1/flows`);
+      const response = await apiClient.get<{ flows: FlowBackend[] }>(`/api/v1/flows`);
       
-      // Extract workflows array from response object
-      const workflowsArray = response?.workflows || [];
+      // Extract flows array from response object
+      const flowsArray = response?.flows || [];
       
-      // Convert backend workflows to frontend format, filtering out any invalid ones
-      return workflowsArray
-        .filter(workflow => workflow != null) // Filter out null/undefined workflows
+      // Convert backend flows to frontend format, filtering out any invalid ones
+      return flowsArray
+        .filter(flow => flow != null) // Filter out null/undefined flows
         .map(convertBackendToFrontend);
     } catch (error) {
-      console.error('Failed to fetch workflows:', error);
-      throw new Error(error instanceof Error ? error.message : 'Failed to fetch workflows');
+      console.error('Failed to fetch flows:', error);
+      throw new Error(error instanceof Error ? error.message : 'Failed to fetch flows');
     }
   }
 
-  // Get a specific workflow by workflow ID
-  static async getWorkflow(workflowId: string): Promise<Workflow> { 
+  // Get a specific flow by flow ID
+  static async getFlow(flowId: string): Promise<Flow> { 
     try {
-      const backendWorkflow = await apiClient.get<WorkflowBackend>(`/api/v1/flows/${workflowId}`);
+      const backendFlow = await apiClient.get<FlowBackend>(`/api/v1/flows/${flowId}`);
       
-      if (!backendWorkflow) {
-        throw new Error('Workflow not found or response is empty');
+      if (!backendFlow) {
+        throw new Error('Flow not found or response is empty');
       }
       
-      // Convert backend workflow to frontend format
-      return convertBackendToFrontend(backendWorkflow);
+      // Convert backend flow to frontend format
+      return convertBackendToFrontend(backendFlow);
     } catch (error) {
-      console.error(`Failed to fetch workflow ${workflowId}:`, error);
-      throw new Error(error instanceof Error ? error.message : 'Failed to fetch workflow');
+      console.error(`Failed to fetch flow ${flowId}:`, error);
+      throw new Error(error instanceof Error ? error.message : 'Failed to fetch flow');
     }
   }
 
-  // Create a new workflow
-  static async createWorkflow(
-    workflow: Partial<Workflow>, 
+  // Create a new flow
+  static async createFlow(
+    flow: Partial<Flow>, 
     nodes: WorkflowNode[] = [], 
     connections: Connection[] = []
-  ): Promise<Workflow> {
+  ): Promise<Flow> {
     try {
-      const requestData = convertFrontendToBackendRequest(workflow, nodes, connections);
+      const requestData = convertFrontendToBackendRequest(flow, nodes, connections);
       
-      const backendWorkflow = await apiClient.post<WorkflowBackend>(`/api/v1/flows`, requestData);
+      const backendFlow = await apiClient.post<FlowBackend>(`/api/v1/flows`, requestData);
       
-      if (!backendWorkflow) {
-        throw new Error('Create workflow response is empty');
+      if (!backendFlow) {
+        throw new Error('Create flow response is empty');
       }
       
-      return convertBackendToFrontend(backendWorkflow);
+      return convertBackendToFrontend(backendFlow);
     } catch (error) {
-      console.error('Failed to create workflow:', error);
-      throw new Error(error instanceof Error ? error.message : 'Failed to create workflow');
+      console.error('Failed to create flow:', error);
+      throw new Error(error instanceof Error ? error.message : 'Failed to create flow');
     }
   }
 
-  // Update an existing workflow
-  static async updateWorkflow(
-    workflowId: string, 
-    workflow: Partial<Workflow>,
+  // Update an existing flow
+  static async updateFlow(
+    flowId: string, 
+    flow: Partial<Flow>,
     nodes: WorkflowNode[] = [],
     connections: Connection[] = []
-  ): Promise<Workflow> {
+  ): Promise<Flow> {
     try {
-      const requestData = convertFrontendToBackendRequest(workflow, nodes, connections);
+      const requestData = convertFrontendToBackendRequest(flow, nodes, connections);
       
-      const backendWorkflow = await apiClient.put<WorkflowBackend>(
-        `/api/v1/flows/${workflowId}`, 
+      const backendFlow = await apiClient.put<FlowBackend>(
+        `/api/v1/flows/${flowId}`, 
         requestData
       );
       
-      if (!backendWorkflow) {
-        throw new Error('Update workflow response is empty');
+      if (!backendFlow) {
+        throw new Error('Update flow response is empty');
       }
       
-      return convertBackendToFrontend(backendWorkflow);
+      return convertBackendToFrontend(backendFlow);
     } catch (error) {
-      console.error(`Failed to update workflow ${workflowId}:`, error);
-      throw new Error(error instanceof Error ? error.message : 'Failed to update workflow');
+      console.error(`Failed to update flow ${flowId}:`, error);
+      throw new Error(error instanceof Error ? error.message : 'Failed to update flow');
     }
   }
 
-  // Delete a workflow
-  static async deleteWorkflow(workflowId: string): Promise<void> {
-    await apiClient.delete<void>(`/api/v1/workflows/${workflowId}`);
+  // Delete a flow
+  static async deleteFlow(flowId: string): Promise<void> {
+    await apiClient.delete<void>(`/api/v1/flows/${flowId}`);
   }
 
-  // Execute a workflow
-  static async executeWorkflow(
-    workflowId: string, 
+  // Execute a flow
+  static async executeFlow(
+    flowId: string, 
     input?: Record<string, unknown>
   ): Promise<{ executionId: string }> {
     return await apiClient.post<{ executionId: string }>(
-      `/api/v1/workflows/${workflowId}/execute`, 
+      `/api/v1/flows/${flowId}/execute`, 
       { input }
     );
   }
 
-  // Get workflow execution status
+  // Get flow execution status
   static async getExecutionStatus(
-    workflowId: string, 
+    flowId: string, 
     executionId: string
   ): Promise<{
     status: 'running' | 'completed' | 'failed' | 'cancelled';
@@ -125,21 +125,21 @@ export class WorkflowService {
       progress: number;
       result?: unknown;
       error?: string;
-    }>(`/api/v1/workflows/${workflowId}/executions/${executionId}`);
+    }>(`/api/v1/flows/${flowId}/executions/${executionId}`);
   }
 
-  // Save workflow (nodes and connections) - this is an alias for updateWorkflow
-  static async saveWorkflow(
-    workflowId: string, 
+  // Save flow (nodes and connections) - this is an alias for updateFlow
+  static async saveFlow(
+    flowId: string, 
     nodes: WorkflowNode[], 
     connections: Connection[]
-  ): Promise<Workflow> {
+  ): Promise<Flow> {
     try {
-      // Use updateWorkflow with empty workflow object since we're just updating nodes/connections
-      return await this.updateWorkflow(workflowId, {}, nodes, connections);
+      // Use updateFlow with empty flow object since we're just updating nodes/connections
+      return await this.updateFlow(flowId, {}, nodes, connections);
     } catch (error) {
-      console.error(`Failed to save workflow ${workflowId}:`, error);
-      throw new Error(error instanceof Error ? error.message : 'Failed to save workflow');
+      console.error(`Failed to save flow ${flowId}:`, error);
+      throw new Error(error instanceof Error ? error.message : 'Failed to save flow');
     }
   }
 
@@ -158,4 +158,52 @@ export class WorkflowService {
       payload
     });
   }
+
+  // Legacy method aliases for backward compatibility
+  static async getWorkflows(): Promise<Flow[]> {
+    return this.getFlows();
+  }
+
+  static async getWorkflow(workflowId: string): Promise<Flow> {
+    return this.getFlow(workflowId);
+  }
+
+  static async createWorkflow(
+    workflow: Partial<Flow>, 
+    nodes: WorkflowNode[] = [], 
+    connections: Connection[] = []
+  ): Promise<Flow> {
+    return this.createFlow(workflow, nodes, connections);
+  }
+
+  static async updateWorkflow(
+    workflowId: string, 
+    workflow: Partial<Flow>,
+    nodes: WorkflowNode[] = [],
+    connections: Connection[] = []
+  ): Promise<Flow> {
+    return this.updateFlow(workflowId, workflow, nodes, connections);
+  }
+
+  static async deleteWorkflow(workflowId: string): Promise<void> {
+    return this.deleteFlow(workflowId);
+  }
+
+  static async executeWorkflow(
+    workflowId: string, 
+    input?: Record<string, unknown>
+  ): Promise<{ executionId: string }> {
+    return this.executeFlow(workflowId, input);
+  }
+
+  static async saveWorkflow(
+    workflowId: string, 
+    nodes: WorkflowNode[], 
+    connections: Connection[]
+  ): Promise<Flow> {
+    return this.saveFlow(workflowId, nodes, connections);
+  }
 }
+
+// Legacy alias for backward compatibility
+export class WorkflowService extends FlowService {}
