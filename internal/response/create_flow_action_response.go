@@ -13,7 +13,7 @@ type CreateFlowActionResponse struct {
 	UID         uuid.UUID              `json:"uid"`
 	ResourceID  string                 `json:"resourceID,omitempty"`
 	DisplayName string                 `json:"displayName"`
-	ActionType  string                 `json:"flowActionType"`
+	ActionType  string                 `json:"actionType"`
 	Template    map[string]interface{} `json:"template"`
 	Transformer map[string]interface{} `json:"transformer"`
 	TriggerMode string                 `json:"triggerMode"`

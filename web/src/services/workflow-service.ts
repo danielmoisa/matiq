@@ -14,7 +14,7 @@ export class WorkflowService {
   // Get all workflows for a team
   static async getWorkflows(): Promise<Workflow[]> { 
     try {
-      const response = await apiClient.get<{ workflows: WorkflowBackend[] }>(`/api/v1/workflows`);
+      const response = await apiClient.get<{ workflows: WorkflowBackend[] }>(`/api/v1/flows`);
       
       // Extract workflows array from response object
       const workflowsArray = response?.workflows || [];
@@ -32,7 +32,7 @@ export class WorkflowService {
   // Get a specific workflow by workflow ID
   static async getWorkflow(workflowId: string): Promise<Workflow> { 
     try {
-      const backendWorkflow = await apiClient.get<WorkflowBackend>(`/api/v1/workflows/${workflowId}`);
+      const backendWorkflow = await apiClient.get<WorkflowBackend>(`/api/v1/flows/${workflowId}`);
       
       if (!backendWorkflow) {
         throw new Error('Workflow not found or response is empty');
@@ -55,7 +55,7 @@ export class WorkflowService {
     try {
       const requestData = convertFrontendToBackendRequest(workflow, nodes, connections);
       
-      const backendWorkflow = await apiClient.post<WorkflowBackend>(`/api/v1/workflows`, requestData);
+      const backendWorkflow = await apiClient.post<WorkflowBackend>(`/api/v1/flows`, requestData);
       
       if (!backendWorkflow) {
         throw new Error('Create workflow response is empty');
@@ -79,7 +79,7 @@ export class WorkflowService {
       const requestData = convertFrontendToBackendRequest(workflow, nodes, connections);
       
       const backendWorkflow = await apiClient.put<WorkflowBackend>(
-        `/api/v1/workflows/${workflowId}`, 
+        `/api/v1/flows/${workflowId}`, 
         requestData
       );
       
@@ -143,20 +143,7 @@ export class WorkflowService {
     }
   }
 
-  // Activate/Deactivate workflow (if backend supports this)
-  static async toggleWorkflowStatus(
-    workflowId: string, 
-    isActive: boolean
-  ): Promise<Workflow> {
-    const backendWorkflow = await apiClient.put<WorkflowBackend>(
-      `/api/v1/workflows/${workflowId}/status`, 
-      { isActive }
-    );
-    
-    return convertBackendToFrontend(backendWorkflow);
-  }
-
-  // Test webhook endpoint (if backend supports this)
+  // Test webhook endpoint 
   static async testWebhook(webhookUrl: string, payload: Record<string, unknown>): Promise<{
     success: boolean;
     response?: unknown;
