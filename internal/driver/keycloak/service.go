@@ -64,32 +64,32 @@ func (sm *ServiceManager) Shutdown(ctx context.Context) error {
 }
 
 // SetupDefaultRoles creates default roles if they don't exist
-func (sm *ServiceManager) SetupDefaultRoles(ctx context.Context) error {
-	defaultRoles := []string{"user", "admin", "workflow-creator", "workflow-executor"}
+// func (sm *ServiceManager) SetupDefaultRoles(ctx context.Context) error {
+// 	defaultRoles := []string{"user", "admin", "workflow-creator", "workflow-executor"}
 
-	for _, roleName := range defaultRoles {
-		// Check if role exists, create if not
-		_, err := sm.client.client.GetRealmRole(ctx, sm.client.adminToken.AccessToken, sm.config.KeycloakRealm, roleName)
-		if err != nil {
-			// Role doesn't exist, create it
-			roleName := roleName
-			role := gocloak.Role{
-				Name:        &roleName,
-				Description: gocloak.StringP(fmt.Sprintf("Default %s role", roleName)),
-			}
+// 	for _, roleName := range defaultRoles {
+// 		// Check if role exists, create if not
+// 		_, err := sm.client.client.GetRealmRole(ctx, sm.client.adminToken.AccessToken, sm.config.KeycloakRealm, roleName)
+// 		if err != nil {
+// 			// Role doesn't exist, create it
+// 			roleName := roleName
+// 			role := gocloak.Role{
+// 				Name:        &roleName,
+// 				Description: gocloak.StringP(fmt.Sprintf("Default %s role", roleName)),
+// 			}
 
-			log.Printf("Creating default role: %s", roleName)
-			_, err = sm.client.client.CreateRealmRole(ctx, sm.client.adminToken.AccessToken, sm.config.KeycloakRealm, role)
-			if err != nil {
-				log.Printf("Warning: Failed to create role %s: %v", roleName, err)
-			} else {
-				log.Printf("Successfully created role: %s", roleName)
-			}
-		}
-	}
+// 			log.Printf("Creating default role: %s", roleName)
+// 			_, err = sm.client.client.CreateRealmRole(ctx, sm.client.adminToken.AccessToken, sm.config.KeycloakRealm, role)
+// 			if err != nil {
+// 				log.Printf("Warning: Failed to create role %s: %v", roleName, err)
+// 			} else {
+// 				log.Printf("Successfully created role: %s", roleName)
+// 			}
+// 		}
+// 	}
 
-	return nil
-}
+// 	return nil
+// }
 
 // CreateDefaultUser creates a default admin user if it doesn't exist
 func (sm *ServiceManager) CreateDefaultUser(ctx context.Context, username, email, password string, roles []string) error {

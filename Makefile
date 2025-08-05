@@ -11,9 +11,6 @@ run-web:
 seed:
 	go run ./cmd/seeder/main.go
 
-seed-workflows:
-	go run ./cmd/seeder/main.go -type=workflows
-
 build: build-http-server build-websocket-server build-seeder
 
 build-http-server:

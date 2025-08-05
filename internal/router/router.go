@@ -22,9 +22,8 @@ func (r *Router) RegisterRouters(engine *gin.Engine) {
 	// init route
 	routerGroup := engine.Group("/api/v1")
 	healthRouter := routerGroup.Group("/health")
-	workflowRouter := routerGroup.Group("/workflows")
+	flowActionRouter := routerGroup.Group("/flows")
 	authRouter := routerGroup.Group("/auth")
-	// flowActionRouter := routerGroup.Group("/flows/:workflow_id")
 
 	// health router
 	healthRouter.GET("", r.Controller.GetHealth)
@@ -43,14 +42,14 @@ func (r *Router) RegisterRouters(engine *gin.Engine) {
 	protectedAuthRouter.Use(r.Controller.AuthMiddleware())
 	protectedAuthRouter.GET("/profile", r.Controller.GetProfile)
 
-	// Workflow routes
+	// Flow action routes
 	// Protected -- requires Bearer token
-	workflowRouter.Use(r.Controller.AuthMiddleware())
-	workflowRouter.POST("", r.Controller.CreateWorkflow)
-	workflowRouter.GET("/:workflowID", r.Controller.GetWorkflow)
-	workflowRouter.GET("", r.Controller.GetWorkflows)
-	workflowRouter.PUT("/:workflowID", r.Controller.UpdateWorkflow)
-	// workflowRouter.DELETE("/:workflowID", r.Controller.DeleteWorkflow)
+	flowActionRouter.Use(r.Controller.AuthMiddleware())
+	flowActionRouter.POST("", r.Controller.CreateFlowAction)
+	flowActionRouter.GET("/:flowActionID", r.Controller.GetFlowAction)
+	flowActionRouter.GET("", r.Controller.GetFlowActions)
+	flowActionRouter.PUT("/:flowActionID", r.Controller.UpdateFlowAction)
+	// flowActionRouter.DELETE("/:flowActionID", r.Controller.DeleteFlowAction)
 	// flowActionRouter.POST("/:flowActionID/run", r.Controller.RunFlowAction)
 
 }

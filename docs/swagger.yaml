@@ -137,7 +137,7 @@ info:
     email: support@swagger.io
     name: API Support
     url: http://www.swagger.io/support
-  description: API for managing automation workflows and tasks.
+  description: API for managing automation flows and tasks.
   license:
     name: MIT
     url: https://opensource.org/licenses/MIT

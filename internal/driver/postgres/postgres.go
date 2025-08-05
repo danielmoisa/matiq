@@ -88,7 +88,7 @@ func NewPostgresConnection(config *PostgresConfig, logger *zap.SugaredLogger) (*
 // GetMigrationModels returns all models that should be migrated
 func GetMigrationModels() []interface{} {
 	return []interface{}{
-		&model.Workflow{},
+		&model.FlowAction{},
 	}
 }
 

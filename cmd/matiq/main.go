@@ -106,7 +106,7 @@ func (server *Server) Start() {
 
 // @title Matiq Automation API
 // @version 1.0
-// @description API for managing automation workflows and tasks.
+// @description API for managing automation flows and tasks.
 // @termsOfService http://swagger.io/terms/
 // @contact.name API Support
 // @contact.url http://www.swagger.io/support

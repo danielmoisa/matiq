@@ -1,14 +1,14 @@
 # Matiq App
 
-A modern workflow automation platform that allows users to design, build, and manage automated workflows through a visual interface. Similar to n8n, this platform enables seamless integration between different services and APIs with robust authentication and authorization.
+A modern flow automation platform that allows users to design, build, and manage automated flows through a visual interface. Similar to n8n, this platform enables seamless integration between different services and APIs with robust authentication and authorization.
 
 ## Features
 
-- Visual workflow designer with drag-and-drop interface
+- Visual flow designer with drag-and-drop interface
 - Keycloak-based authentication and group-based permissions
 - RESTful API with Bearer token security
 - Support for various node types (databases, APIs, triggers, actions)
-- Real-time workflow execution and monitoring
+- Real-time flow execution and monitoring
 
 ## Tech Stack
 

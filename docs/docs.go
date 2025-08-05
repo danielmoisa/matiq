@@ -498,7 +498,7 @@ var SwaggerInfo = &swag.Spec{
 	BasePath:         "/api/v1",
 	Schemes:          []string{"http", "https"},
 	Title:            "Matiq Automation API",
-	Description:      "API for managing automation workflows and tasks.",
+	Description:      "API for managing automation flows and tasks.",
 	InfoInstanceName: "swagger",
 	SwaggerTemplate:  docTemplate,
 	LeftDelim:        "{{",

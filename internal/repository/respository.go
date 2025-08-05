@@ -6,11 +6,11 @@ import (
 )
 
 type Repository struct {
-	WorkflowRepository *WorkflowRepository
+	FlowActionRepository *FlowActionRepository
 }
 
 func NewRepository(postgresDriver *gorm.DB, logger *zap.SugaredLogger) *Repository {
 	return &Repository{
-		WorkflowRepository: NewWorkflowRepository(logger, postgresDriver),
+		FlowActionRepository: NewFlowActionRepository(logger, postgresDriver),
 	}
 }
